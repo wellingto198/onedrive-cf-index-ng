@@ -1,10 +1,11 @@
 import type { OdFileObject } from '../../types'
 
-import { FC, useEffect, useState, useRef } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import Plyr from 'plyr-react'
 import { useAsync } from 'react-async-hook'
 import { useClipboard } from 'use-clipboard-copy'
 
@@ -18,7 +19,7 @@ import FourOhFour from '../FourOhFour'
 import Loading from '../Loading'
 import CustomEmbedLinkMenu from '../CustomEmbedLinkMenu'
 
-import Artplayer from 'artplayer'
+import 'plyr-react/plyr.css'
 
 const VideoPlayer: FC<{
   videoName: string
@@ -30,43 +31,46 @@ const VideoPlayer: FC<{
   isFlv: boolean
   mpegts: any
 }> = ({ videoName, videoUrl, width, height, thumbnail, subtitle, isFlv, mpegts }) => {
-  const artplayerRef = useRef<HTMLDivElement>(null)
-
   useEffect(() => {
-    const art = new Artplayer({
-      container: artplayerRef.current!,
-      url: videoUrl,
-      poster: thumbnail,
-      title: videoName,
-      width: width ?? 720,
-      height: height ?? 405,
-      subtitle: {
-        url: subtitle,
-        type: 'webvtt',
-        style: {
-          color: '#fff',
-        },
-      },
-      playbackRate: [0.5, 1.0, 1.5, 2.0],
-      fullscreen: true,
-      autoSize: true,
-      customType: {
-        flv: (videoElement: HTMLMediaElement, videoUrl: string) => {
-          if (mpegts) {
-            const flvPlayer = mpegts.createPlayer({ url: videoUrl, type: 'flv' })
-            flvPlayer.attachMediaElement(videoElement)
-            flvPlayer.load()
-          }
-        },
-      },
-    })
+    // Really really hacky way to inject subtitles as file blobs into the video element
+    axios
+      .get(subtitle, { responseType: 'blob' })
+      .then(resp => {
+        const track = document.querySelector('track')
+        track?.setAttribute('src', URL.createObjectURL(resp.data))
+      })
+      .catch(() => {
+        console.log('Could not load subtitle.')
+      })
 
-    return () => {
-      art.destroy() // Clean up the player on unmount
+    if (isFlv) {
+      const loadFlv = () => {
+        // Really hacky way to get the exposed video element from Plyr
+        const video = document.getElementById('plyr')
+        const flv = mpegts.createPlayer({ url: videoUrl, type: 'flv' })
+        flv.attachMediaElement(video)
+        flv.load()
+      }
+      loadFlv()
     }
-  }, [videoUrl, thumbnail, subtitle, isFlv, mpegts, width, height])
+  }, [videoUrl, isFlv, mpegts, subtitle])
 
-  return <div ref={artplayerRef}></div>
+  // Common plyr configs, including the video source and plyr options
+  const plyrSource = {
+    type: 'video',
+    title: videoName,
+    poster: thumbnail,
+    tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
+  }
+  const plyrOptions: Plyr.Options = {
+    ratio: `${width ?? 16}:${height ?? 9}`,
+    fullscreen: { iosNative: true },
+  }
+  if (!isFlv) {
+    // If the video is not in flv format, we can use the native plyr and add sources directly with the video URL
+    plyrSource['sources'] = [{ src: videoUrl }]
+  }
+  return <Plyr id="plyr" source={plyrSource as Plyr.SourceInfo} options={plyrOptions} />
 }
 
 const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
@@ -137,10 +141,36 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             btnIcon="copy"
           />
           <DownloadButton
-            onClickCallback={() => setMenuOpen(true)}  // Correção aqui!
+            onClickCallback={() => setMenuOpen(true)}
             btnColor="teal"
             btnText={'Customise link'}
             btnIcon="pen"
+          />
+
+          <DownloadButton
+            onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}
+            btnText="IINA"
+            btnImage="/players/iina.png"
+          />
+          <DownloadButton
+            onClickCallback={() => window.open(`vlc://${getBaseUrl()}${videoUrl}`)}
+            btnText="VLC"
+            btnImage="/players/vlc.png"
+          />
+          <DownloadButton
+            onClickCallback={() => window.open(`potplayer://${getBaseUrl()}${videoUrl}`)}
+            btnText="PotPlayer"
+            btnImage="/players/potplayer.png"
+          />
+          <DownloadButton
+            onClickCallback={() => window.open(`nplayer-http://${window?.location.hostname ?? ''}${videoUrl}`)}
+            btnText="nPlayer"
+            btnImage="/players/nplayer.png"
+          />
+          <DownloadButton
+            onClickCallback={() => window.open(`intent://${getBaseUrl()}${videoUrl}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
+            btnText="mpv-android"
+            btnImage="/players/mpv-android.png"
           />
         </div>
       </DownloadBtnContainer>
