@@ -137,4 +137,15 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             btnIcon="copy"
           />
           <DownloadButton
-            onClickCallback={() => setMenuOpen(true
+            onClickCallback={() => setMenuOpen(true)}  // Correção aqui!
+            btnColor="teal"
+            btnText={'Customise link'}
+            btnIcon="pen"
+          />
+        </div>
+      </DownloadBtnContainer>
+    </>
+  )
+}
+
+export default VideoPreview
