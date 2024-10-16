@@ -211,7 +211,7 @@ export default function SearchModal({
                   type="text"
                   id="search-box"
                   className="w-full bg-transparent focus:outline-none focus-visible:outline-none"
-                  placeholder={'Buscar...'}
+                  placeholder={'Search ...'}
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                 />
@@ -224,16 +224,16 @@ export default function SearchModal({
                 {results.loading && (
                   <div className="px-4 py-12 text-center text-sm font-medium">
                     <LoadingIcon className="svg-inline--fa mr-2 inline-block h-4 w-4 animate-spin" />
-                    <span>{'Carregando...'}</span>
+                    <span>{'Loading ...'}</span>
                   </div>
                 )}
                 {results.error && (
-                  <div className="px-4 py-12 text-center text-sm font-medium">{`Erro: ${results.error.message}`}</div>
+                  <div className="px-4 py-12 text-center text-sm font-medium">{`Error: ${results.error.message}`}</div>
                 )}
                 {results.result && (
                   <>
                     {results.result.length === 0 ? (
-                      <div className="px-4 py-12 text-center text-sm font-medium">{'Nada encontrado.'}</div>
+                      <div className="px-4 py-12 text-center text-sm font-medium">{'Nothing here.'}</div>
                     ) : (
                       results.result.map(result => <SearchResultItem key={result.id} result={result} />)
                     )}
