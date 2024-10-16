@@ -128,22 +128,22 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
           <DownloadButton
             onClickCallback={() => window.open(videoUrl)}
             btnColor="blue"
-            btnText={'Download'}
+            btnText={'Baixar'}
             btnIcon="file-download"
           />
           <DownloadButton
             onClickCallback={() => {
               clipboard.copy(`${getBaseUrl()}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`)
-              toast.success('Copied direct link to clipboard.')
+              toast.success('Link Copiado.')
             }}
             btnColor="pink"
-            btnText={'Copy direct link'}
+            btnText={'Copiar Link Direct'}
             btnIcon="copy"
           />
           <DownloadButton
             onClickCallback={() => setMenuOpen(true)}
             btnColor="teal"
-            btnText={'Customise link'}
+            btnText={'Link Custom'}
             btnIcon="pen"
           />
 
