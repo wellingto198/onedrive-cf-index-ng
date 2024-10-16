@@ -125,66 +125,69 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
 
       
       <DownloadBtnContainer>
-        <div className="flex flex-wrap justify-center gap-2">
-          <DownloadButton
-            onClickCallback={() => window.open(videoUrl)}
-            btnColor="blue"
-            btnText={'Baixar'}
-            btnIcon="file-download"
-          />
-          <DownloadButton
-            onClickCallback={() => {
-              clipboard.copy(`${getBaseUrl()}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`)
-              toast.success('Link Copiado.')
-            }}
-            btnColor="pink"
-            btnText={'Copiar Link'}
-            btnIcon="copy"
-          />
+      <DownloadBtnContainer>
+  <div className="flex flex-wrap justify-center gap-2">
+    <DownloadButton
+      onClickCallback={() => window.open(videoUrl)}
+      btnColor="blue"
+      btnText={'Baixar'}
+      btnIcon="file-download"
+    />
+    <DownloadButton
+      onClickCallback={() => {
+        clipboard.copy(`${getBaseUrl()}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`)
+        toast.success('Link Copiado.')
+      }}
+      btnColor="pink"
+      btnText={'Copiar Link'}
+      btnIcon="copy"
+    />
 
-          {/* Texto acima dos botões */}
-     <p style={{ color: 'white', textAlign: 'center' }}>
-    {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
+    {/* Texto acima dos botões */}
+    <p style={{ color: 'white', textAlign: 'center' }}>
+      {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
+        <>
+          Sem áudio?{' '}
+          <a href="https://www.codecguide.com/download_k-lite_codec_pack_basic.htm" target="_blank" rel="noopener noreferrer" style={{ color: '#ADD8E6' }}>
+            Instale K-lite
+          </a>
+        </>
+      ) : (
+        'Sem áudio? Use algum dos players abaixo'
+      )}
+    </p>
+
+    {/* Renderiza os botões de players apenas se não estiver no Windows */}
+    {typeof window !== 'undefined' && !window.navigator.platform.includes('Win') && (
       <>
-        Sem áudio?{' '}
-        <a href="https://www.codecguide.com/download_k-lite_codec_pack_basic.htm" target="_blank" rel="noopener noreferrer" style={{ color: '#ADD8E6' }}>
-          Instale K-lite
-        </a>
+        <DownloadButton
+          onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}
+          btnText="IINA"
+          btnImage="/players/iina.png"
+        />
+        <DownloadButton
+          onClickCallback={() => window.open(`vlc://${getBaseUrl()}${videoUrl}`)}
+          btnText="VLC"
+          btnImage="/players/vlc.png"
+        />
+        <DownloadButton
+          onClickCallback={() => window.open(`potplayer://${getBaseUrl()}${videoUrl}`)}
+          btnText="PotPlayer"
+          btnImage="/players/potplayer.png"
+        />
+        <DownloadButton
+          onClickCallback={() => window.open(`nplayer-http://${window?.location.hostname ?? ''}${videoUrl}`)}
+          btnText="nPlayer"
+          btnImage="/players/nplayer.png"
+        />
+        <DownloadButton
+          onClickCallback={() => window.open(`intent://${getBaseUrl()}${videoUrl}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
+          btnText="mpv-android"
+          btnImage="/players/mpv-android.png"
+        />
       </>
-    ) : (
-      'Sem áudio? Use algum dos players abaixo'
     )}
-  </p>
-
-          <DownloadButton
-            onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}
-            btnText="IINA"
-            btnImage="/players/iina.png"
-          />
-          <DownloadButton
-            onClickCallback={() => window.open(`vlc://${getBaseUrl()}${videoUrl}`)}
-            btnText="VLC"
-            btnImage="/players/vlc.png"
-          />
-          <DownloadButton
-            onClickCallback={() => window.open(`potplayer://${getBaseUrl()}${videoUrl}`)}
-            btnText="PotPlayer"
-            btnImage="/players/potplayer.png"
-          />
-          <DownloadButton
-            onClickCallback={() => window.open(`nplayer-http://${window?.location.hostname ?? ''}${videoUrl}`)}
-            btnText="nPlayer"
-            btnImage="/players/nplayer.png"
-          />
-          <DownloadButton
-            onClickCallback={() => window.open(`intent://${getBaseUrl()}${videoUrl}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
-            btnText="mpv-android"
-            btnImage="/players/mpv-android.png"
-          />
-        </div>
-      </DownloadBtnContainer>
-    </>
-  )
-}
+  </div>
+</DownloadBtnContainer>
 
 export default VideoPreview
