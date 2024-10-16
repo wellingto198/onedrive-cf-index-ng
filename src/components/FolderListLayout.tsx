@@ -11,7 +11,7 @@ import { humanFileSize, formatModifiedDateTime } from '../utils/fileDetails'
 import { Downloading, Checkbox, ChildIcon, ChildName } from './FileListing'
 import { getStoredToken } from '../utils/protectedRouteHandler'
 
-const FileListItem: FC<{ fileContent: OdFolderChildren }> = ({ fileContent: c }) => {
+const ItemListaArquivo: FC<{ conteudoArquivo: OdFolderChildren }> = ({ conteudoArquivo: c }) => {
   return (
     <div className="grid cursor-pointer grid-cols-10 items-center space-x-2 px-3 py-2.5">
       <div className="col-span-10 flex items-center space-x-2 truncate md:col-span-6" title={c.name}>
@@ -30,25 +30,25 @@ const FileListItem: FC<{ fileContent: OdFolderChildren }> = ({ fileContent: c })
   )
 }
 
-const FolderListLayout = ({
-  path,
-  folderChildren,
-  selected,
-  toggleItemSelected,
-  totalSelected,
-  toggleTotalSelected,
-  totalGenerating,
-  handleSelectedDownload,
-  folderGenerating,
-  handleSelectedPermalink,
-  handleFolderDownload,
+const LayoutListaPasta = ({
+  caminho,
+  filhosPasta,
+  selecionados,
+  alternarItemSelecionado,
+  totalSelecionados,
+  alternarTotalSelecionados,
+  gerandoTotal,
+  manipularDownloadSelecionados,
+  gerandoPasta,
+  manipularPermalinkSelecionados,
+  manipularDownloadPasta,
   toast,
 }) => {
   const clipboard = useClipboard()
-  const hashedToken = getStoredToken(path)
+  const tokenHash = getStoredToken(caminho)
 
-  // Get item path from item name
-  const getItemPath = (name: string) => `${path === '/' ? '' : path}/${encodeURIComponent(name)}`
+  // Obter caminho do item pelo nome
+  const obterCaminhoItem = (nome: string) => `${caminho === '/' ? '' : caminho}/${encodeURIComponent(nome)}`
 
   return (
     <div className="rounded bg-white shadow-sm dark:bg-gray-900 dark:text-gray-100">
@@ -68,30 +68,30 @@ const FolderListLayout = ({
         <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
           <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
             <Checkbox
-              checked={totalSelected}
-              onChange={toggleTotalSelected}
+              checked={totalSelecionados}
+              onChange={alternarTotalSelecionados}
               indeterminate={true}
               title={'Selecionar arquivos'}
             />
             <button
-              title={'Copiar link permanente dos arquivos selecionados'}
+              title={'Copiar permalink dos arquivos selecionados'}
               className="cursor-pointer rounded p-1.5 hover:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-400 disabled:hover:bg-white dark:hover:bg-gray-600 disabled:dark:text-gray-600 disabled:hover:dark:bg-gray-900"
-              disabled={totalSelected === 0}
+              disabled={totalSelecionados === 0}
               onClick={() => {
-                clipboard.copy(handleSelectedPermalink(getBaseUrl()))
-                toast.success('Link permanente dos arquivos selecionados copiado.')
+                clipboard.copy(manipularPermalinkSelecionados(getBaseUrl()))
+                toast.success('Permalink dos arquivos selecionados copiado.')
               }}
             >
               <FontAwesomeIcon icon={['far', 'copy']} size="lg" />
             </button>
-            {totalGenerating ? (
-              <Downloading title={'Baixando arquivos selecionados, atualize a página para cancelar'} style="p-1.5" />
+            {gerandoTotal ? (
+              <Downloading title={'Baixando arquivos selecionados, recarregue a página para cancelar'} style="p-1.5" />
             ) : (
               <button
                 title={'Baixar arquivos selecionados'}
                 className="cursor-pointer rounded p-1.5 hover:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-400 disabled:hover:bg-white dark:hover:bg-gray-600 disabled:dark:text-gray-600 disabled:hover:dark:bg-gray-900"
-                disabled={totalSelected === 0}
-                onClick={handleSelectedDownload}
+                disabled={totalSelecionados === 0}
+                onClick={manipularDownloadSelecionados}
               >
                 <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} size="lg" />
               </button>
@@ -100,40 +100,40 @@ const FolderListLayout = ({
         </div>
       </div>
 
-      {folderChildren.map((c: OdFolderChildren) => (
+      {filhosPasta.map((c: OdFolderChildren) => (
         <div
           className="grid grid-cols-12 transition-all duration-100 hover:bg-gray-100 dark:hover:bg-gray-850"
           key={c.id}
         >
           <Link
-            href={`${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`}
+            href={`${caminho === '/' ? '' : caminho}/${encodeURIComponent(c.name)}`}
             passHref
             className="col-span-12 md:col-span-10"
           >
-            <FileListItem fileContent={c} />
+            <ItemListaArquivo conteudoArquivo={c} />
           </Link>
 
           {c.folder ? (
             <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
               <span
-                title={'Copiar link permanente da pasta'}
+                title={'Copiar permalink da pasta'}
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                 onClick={() => {
-                  clipboard.copy(`${getBaseUrl()}${`${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`}`)
-                  toast('Link permanente da pasta copiado.', { icon: '👌' })
+                  clipboard.copy(`${getBaseUrl()}${`${caminho === '/' ? '' : caminho}/${encodeURIComponent(c.name)}`}`)
+                  toast('Permalink da pasta copiado.', { icon: '👌' })
                 }}
               >
                 <FontAwesomeIcon icon={['far', 'copy']} />
               </span>
-              {folderGenerating[c.id] ? (
-                <Downloading title={'Baixando pasta, atualize a página para cancelar'} style="px-1.5 py-1" />
+              {gerandoPasta[c.id] ? (
+                <Downloading title={'Baixando pasta, recarregue a página para cancelar'} style="px-1.5 py-1" />
               ) : (
                 <span
                   title={'Baixar pasta'}
                   className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                   onClick={() => {
-                    const p = `${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`
-                    handleFolderDownload(p, c.id, c.name)()
+                    const p = `${caminho === '/' ? '' : caminho}/${encodeURIComponent(c.name)}`
+                    manipularDownloadPasta(p, c.id, c.name)()
                   }}
                 >
                   <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
@@ -143,13 +143,13 @@ const FolderListLayout = ({
           ) : (
             <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
               <span
-                title={'Copiar link permanente do arquivo bruto'}
+                title={'Copiar permalink do arquivo bruto'}
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                 onClick={() => {
                   clipboard.copy(
-                    `${getBaseUrl()}/api/raw?path=${getItemPath(c.name)}${hashedToken ? `&odpt=${hashedToken}` : ''}`
+                    `${getBaseUrl()}/api/raw?path=${obterCaminhoItem(c.name)}${tokenHash ? `&odpt=${tokenHash}` : ''}`
                   )
-                  toast.success('Link permanente do arquivo bruto copiado.')
+                  toast.success('Permalink do arquivo bruto copiado.')
                 }}
               >
                 <FontAwesomeIcon icon={['far', 'copy']} />
@@ -157,7 +157,7 @@ const FolderListLayout = ({
               <a
                 title={'Baixar arquivo'}
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
-                href={`/api/raw?path=${getItemPath(c.name)}${hashedToken ? `&odpt=${hashedToken}` : ''}`}
+                href={`/api/raw?path=${obterCaminhoItem(c.name)}${tokenHash ? `&odpt=${tokenHash}` : ''}`}
               >
                 <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
               </a>
@@ -166,8 +166,8 @@ const FolderListLayout = ({
           <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
             {!c.folder && !(c.name === '.password') && (
               <Checkbox
-                checked={selected[c.id] ? 2 : 0}
-                onChange={() => toggleItemSelected(c.id)}
+                checked={selecionados[c.id] ? 2 : 0}
+                onChange={() => alternarItemSelecionado(c.id)}
                 title={'Selecionar arquivo'}
               />
             )}
@@ -178,4 +178,4 @@ const FolderListLayout = ({
   )
 }
 
-export default FolderListLayout
+export default LayoutListaPasta
