@@ -11,20 +11,20 @@ import { humanFileSize, formatModifiedDateTime } from '../utils/fileDetails'
 import { Downloading, Checkbox, ChildIcon, ChildName } from './FileListing'
 import { getStoredToken } from '../utils/protectedRouteHandler'
 
-const FileItem: FC<{ fileContent: OdFolderChildren }> = ({ fileContent: f }) => {
+const FileListItem: FC<{ fileContent: OdFolderChildren }> = ({ fileContent: c }) => {
   return (
     <div className="grid cursor-pointer grid-cols-10 items-center space-x-2 px-3 py-2.5">
-      <div className="col-span-10 flex items-center space-x-2 truncate md:col-span-6" title={f.name}>
+      <div className="col-span-10 flex items-center space-x-2 truncate md:col-span-6" title={c.name}>
         <div className="w-5 flex-shrink-0 text-center">
-          <ChildIcon child={f} />
+          <ChildIcon child={c} />
         </div>
-        <ChildName name={f.name} folder={Boolean(f.folder)} />
+        <ChildName name={c.name} folder={Boolean(c.folder)} />
       </div>
       <div className="col-span-3 hidden flex-shrink-0 font-mono text-sm text-gray-700 dark:text-gray-500 md:block">
-        {formatModifiedDateTime(f.lastModifiedDateTime)}
+        {formatModifiedDateTime(c.lastModifiedDateTime)}
       </div>
       <div className="col-span-1 hidden flex-shrink-0 truncate font-mono text-sm text-gray-700 dark:text-gray-500 md:block">
-        {humanFileSize(f.size)}
+        {humanFileSize(c.size)}
       </div>
     </div>
   )
@@ -45,9 +45,9 @@ const FolderListLayout = ({
   toast,
 }) => {
   const clipboard = useClipboard()
-  const tokenHash = getStoredToken(path)
+  const hashedToken = getStoredToken(path)
 
-  // Get path for an item by name
+  // Get item path from item name
   const getItemPath = (name: string) => `${path === '/' ? '' : path}/${encodeURIComponent(name)}`
 
   return (
@@ -74,18 +74,18 @@ const FolderListLayout = ({
               title={'Select files'}
             />
             <button
-              title={'Copy permalink of selected files'}
+              title={'Copy selected files permalink'}
               className="cursor-pointer rounded p-1.5 hover:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-400 disabled:hover:bg-white dark:hover:bg-gray-600 disabled:dark:text-gray-600 disabled:hover:dark:bg-gray-900"
               disabled={totalSelected === 0}
               onClick={() => {
                 clipboard.copy(handleSelectedPermalink(getBaseUrl()))
-                toast.success('Permalink of selected files copied.')
+                toast.success('Copied selected files permalink.')
               }}
             >
               <FontAwesomeIcon icon={['far', 'copy']} size="lg" />
             </button>
             {totalGenerating ? (
-              <Downloading title={'Downloading selected files, refresh the page to cancel'} style="p-1.5" />
+              <Downloading title={'Downloading selected files, refresh page to cancel'} style="p-1.5" />
             ) : (
               <button
                 title={'Download selected files'}
@@ -100,40 +100,40 @@ const FolderListLayout = ({
         </div>
       </div>
 
-      {folderChildren.map((f: OdFolderChildren) => (
+      {folderChildren.map((c: OdFolderChildren) => (
         <div
           className="grid grid-cols-12 transition-all duration-100 hover:bg-gray-100 dark:hover:bg-gray-850"
-          key={f.id}
+          key={c.id}
         >
           <Link
-            href={`${path === '/' ? '' : path}/${encodeURIComponent(f.name)}`}
+            href={`${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`}
             passHref
             className="col-span-12 md:col-span-10"
           >
-            <FileItem fileContent={f} />
+            <FileListItem fileContent={c} />
           </Link>
 
-          {f.folder ? (
+          {c.folder ? (
             <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
               <span
                 title={'Copy folder permalink'}
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                 onClick={() => {
-                  clipboard.copy(`${getBaseUrl()}${`${path === '/' ? '' : path}/${encodeURIComponent(f.name)}`}`)
-                  toast('Folder permalink copied.', { icon: '👌' })
+                  clipboard.copy(`${getBaseUrl()}${`${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`}`)
+                  toast('Copied folder permalink.', { icon: '👌' })
                 }}
               >
                 <FontAwesomeIcon icon={['far', 'copy']} />
               </span>
-              {folderGenerating[f.id] ? (
-                <Downloading title={'Downloading folder, refresh the page to cancel'} style="px-1.5 py-1" />
+              {folderGenerating[c.id] ? (
+                <Downloading title={'Downloading folder, refresh page to cancel'} style="px-1.5 py-1" />
               ) : (
                 <span
                   title={'Download folder'}
                   className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                   onClick={() => {
-                    const p = `${path === '/' ? '' : path}/${encodeURIComponent(f.name)}`
-                    handleFolderDownload(p, f.id, f.name)()
+                    const p = `${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`
+                    handleFolderDownload(p, c.id, c.name)()
                   }}
                 >
                   <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
@@ -147,9 +147,9 @@ const FolderListLayout = ({
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                 onClick={() => {
                   clipboard.copy(
-                    `${getBaseUrl()}/api/raw?path=${getItemPath(f.name)}${tokenHash ? `&odpt=${tokenHash}` : ''}`
+                    `${getBaseUrl()}/api/raw?path=${getItemPath(c.name)}${hashedToken ? `&odpt=${hashedToken}` : ''}`
                   )
-                  toast.success('Raw file permalink copied.')
+                  toast.success('Copied raw file permalink.')
                 }}
               >
                 <FontAwesomeIcon icon={['far', 'copy']} />
@@ -157,17 +157,17 @@ const FolderListLayout = ({
               <a
                 title={'Download file'}
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
-                href={`/api/raw?path=${getItemPath(f.name)}${tokenHash ? `&odpt=${tokenHash}` : ''}`}
+                href={`/api/raw?path=${getItemPath(c.name)}${hashedToken ? `&odpt=${hashedToken}` : ''}`}
               >
                 <FontAwesomeIcon icon={['far', 'arrow-alt-circle-down']} />
               </a>
             </div>
           )}
           <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
-            {!f.folder && !(f.name === '.password') && (
+            {!c.folder && !(c.name === '.password') && (
               <Checkbox
-                checked={selected[f.id] ? 2 : 0}
-                onChange={() => toggleItemSelected(f.id)}
+                checked={selected[c.id] ? 2 : 0}
+                onChange={() => toggleItemSelected(c.id)}
                 title={'Select file'}
               />
             )}
