@@ -31,17 +31,17 @@ const ItemListaArquivo: FC<{ conteudoArquivo: OdFolderChildren }> = ({ conteudoA
 }
 
 const LayoutListaPasta = ({
-  caminho,
-  filhosPasta,
-  selecionados,
-  alternarItemSelecionado,
-  totalSelecionados,
-  alternarTotalSelecionados,
-  gerandoTotal,
-  manipularDownloadSelecionados,
-  gerandoPasta,
-  manipularPermalinkSelecionados,
-  manipularDownloadPasta,
+  path,
+  folderChildren,
+  selected,
+  toggleItemSelected,
+  totalSelected,
+  toggleTotalSelected,
+  totalGenerating,
+  handleSelectedDownload,
+  folderGenerating,
+  handleSelectedPermalink,
+  handleFolderDownload,
   toast,
 }) => {
   const clipboard = useClipboard()
