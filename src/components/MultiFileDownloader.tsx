@@ -6,16 +6,16 @@ import { fetcher } from '../utils/fetchWithSWR'
 import { getStoredToken } from '../utils/protectedRouteHandler'
 
 /**
- * A loading toast component with file download progress support
+ * Componente de toast de carregamento com suporte para progresso de download de arquivos
  * @param props
- * @param props.router Next router instance, used for reloading the page
- * @param props.progress Current downloading and compression progress (returned by jszip metadata)
+ * @param props.router Instância do roteador Next, usada para recarregar a página
+ * @param props.progress Progresso atual de download e compressão (retornado pelos metadados do jszip)
  */
 export function DownloadingToast({ router, progress }: { router: NextRouter; progress?: string }) {
   return (
     <div className="flex items-center space-x-2">
       <div className="w-56">
-        <span>{progress ? `Downloading ${progress}%` : 'Downloading selected files...'}</span>
+        <span>{progress ? `Baixando ${progress}%` : 'Baixando arquivos selecionados...'}</span>
 
         <div className="relative mt-2">
           <div className="flex h-1 overflow-hidden rounded bg-gray-100">
@@ -27,20 +27,20 @@ export function DownloadingToast({ router, progress }: { router: NextRouter; pro
         className="rounded bg-red-500 p-2 text-white hover:bg-red-400 focus:outline-none focus:ring focus:ring-red-300"
         onClick={() => router.reload()}
       >
-        {'Cancel'}
+        {'Cancelar'}
       </button>
     </div>
   )
 }
 
-// Blob download helper
+// Helper de download de Blob
 export function downloadBlob({ blob, name }: { blob: Blob; name: string }) {
-  // Prepare for download
+  // Preparar para download
   const el = document.createElement('a')
   el.style.display = 'none'
   document.body.appendChild(el)
 
-  // Download zip file
+  // Baixar arquivo zip
   const bUrl = window.URL.createObjectURL(blob)
   el.href = bUrl
   el.download = name
@@ -50,10 +50,10 @@ export function downloadBlob({ blob, name }: { blob: Blob; name: string }) {
 }
 
 /**
- * Download multiple files after compressing them into a zip
- * @param toastId Toast ID to be used for toast notification
- * @param files Files to be downloaded
- * @param folder Optional folder name to hold files, otherwise flatten files in the zip
+ * Baixar múltiplos arquivos após compactá-los em um zip
+ * @param toastId ID do Toast a ser usado para notificação
+ * @param files Arquivos a serem baixados
+ * @param folder Nome opcional da pasta que conterá os arquivos, caso contrário, os arquivos serão achatados no zip
  */
 export async function downloadMultipleFiles({
   toastId,
@@ -69,7 +69,7 @@ export async function downloadMultipleFiles({
   const zip = new JSZip()
   const dir = folder ? zip.folder(folder)! : zip
 
-  // Add selected file blobs to zip
+  // Adicionar blobs dos arquivos selecionados ao zip
   files.forEach(({ name, url }) => {
     dir.file(
       name,
@@ -79,7 +79,7 @@ export async function downloadMultipleFiles({
     )
   })
 
-  // Create zip file and download it
+  // Criar o arquivo zip e baixar
   const b = await zip.generateAsync({ type: 'blob' }, metadata => {
     toast.loading(<DownloadingToast router={router} progress={metadata.percent.toFixed(0)} />, {
       id: toastId,
@@ -89,15 +89,13 @@ export async function downloadMultipleFiles({
 }
 
 /**
- * Download hierarchical tree-like files after compressing them into a zip
- * @param toastId Toast ID to be used for toast notification
- * @param files Files to be downloaded. Array of file and folder items excluding root folder.
- * Folder items MUST be in front of its children items in the array.
- * Use async generator because generation of the array may be slow.
- * When waiting for its generation, we can meanwhile download bodies of already got items.
- * Only folder items can have url undefined.
- * @param basePath Root dir path of files to be downloaded
- * @param folder Optional folder name to hold files, otherwise flatten files in the zip
+ * Baixar arquivos em formato de árvore hierárquica após compactá-los em um zip
+ * @param toastId ID do Toast a ser usado para notificação
+ * @param files Arquivos a serem baixados. Array de itens de arquivo e pasta, excluindo a pasta raiz.
+ * Itens de pasta DEVEM estar na frente dos seus itens filhos no array.
+ * Use gerador assíncrono, pois a geração do array pode ser lenta.
+ * @param basePath Caminho da pasta raiz dos arquivos a serem baixados
+ * @param folder Nome opcional da pasta que conterá os arquivos, caso contrário, os arquivos serão achatados no zip
  */
 export async function downloadTreelikeMultipleFiles({
   toastId,
@@ -121,9 +119,9 @@ export async function downloadTreelikeMultipleFiles({
   const root = folder ? zip.folder(folder)! : zip
   const map = [{ path: basePath, dir: root }]
 
-  // Add selected file blobs to zip according to its path
+  // Adicionar blobs dos arquivos selecionados ao zip conforme o caminho
   for await (const { name, url, path, isFolder } of files) {
-    // Search parent dir in map
+    // Procurar diretório pai no mapa
     const i = map
       .slice()
       .reverse()
@@ -132,10 +130,10 @@ export async function downloadTreelikeMultipleFiles({
           path.substring(0, parent.length) === parent && path.substring(parent.length + 1).indexOf('/') === -1
       )
     if (i === -1) {
-      throw new Error('File array does not satisfy requirement')
+      throw new Error('Array de arquivos não satisfaz os requisitos')
     }
 
-    // Add file or folder to zip
+    // Adicionar arquivo ou pasta ao zip
     const dir = map[map.length - 1 - i].dir
     if (isFolder) {
       map.push({ path, dir: dir.folder(name)! })
@@ -147,7 +145,7 @@ export async function downloadTreelikeMultipleFiles({
     }
   }
 
-  // Create zip file and download it
+  // Criar o arquivo zip e baixar
   const b = await zip.generateAsync({ type: 'blob' }, metadata => {
     toast.loading(<DownloadingToast router={router} progress={metadata.percent.toFixed(0)} />, {
       id: toastId,
@@ -164,48 +162,48 @@ interface TraverseItem {
 }
 
 /**
- * One-shot concurrent top-down file traversing for the folder.
- * Due to react hook limit, we cannot reuse SWR utils for recursive actions.
- * We will directly fetch API and arrange responses instead.
- * In folder tree, we visit folders top-down as concurrently as possible.
- * Every time we visit a folder, we fetch and return meta of all its children.
- * If folders have pagination, partically retrieved items are not returned immediately,
- * but after all children of the folder have been successfully retrieved.
- * If an error occurred in paginated fetching, all children will be dropped.
- * @param path Folder to be traversed. The path should be cleaned in advance.
- * @returns Array of items representing folders and files of traversed folder top-down and excluding root folder.
- * Due to top-down, Folder items are ALWAYS in front of its children items.
- * Error key in the item will contain the error when there is a handleable error.
+ * Traversing de arquivos em uma pasta de maneira assíncrona e concorrente.
+ * Devido à limitação dos hooks do React, não podemos reutilizar os utilitários do SWR para ações recursivas.
+ * Faremos diretamente o fetch da API e organizaremos as respostas.
+ * Nas árvores de pastas, visitamos as pastas de maneira concorrente o máximo possível.
+ * Toda vez que visitamos uma pasta, fazemos o fetch e retornamos os metadados de todos os filhos.
+ * Se houver paginação, itens parcialmente recuperados não serão retornados imediatamente,
+ * mas somente após todos os filhos da pasta terem sido recuperados com sucesso.
+ * Se ocorrer um erro na obtenção paginada, todos os filhos serão descartados.
+ * @param path Pasta a ser percorrida. O caminho deve ser limpo antecipadamente.
+ * @returns Array de itens representando pastas e arquivos da pasta percorrida, de cima para baixo e excluindo a pasta raiz.
+ * Devido ao percurso de cima para baixo, os itens de pasta estão SEMPRE à frente de seus itens filhos.
+ * A chave de erro no item conterá o erro quando houver um erro tratável.
  */
 export async function* traverseFolder(path: string): AsyncGenerator<TraverseItem, void, undefined> {
   const hashedToken = getStoredToken(path)
 
-  // Generate the task passed to Promise.race to request a folder
+  // Gerar a tarefa passada para Promise.race para solicitar uma pasta
   const genTask = async (i: number, path: string, next?: string) => {
     return {
       i,
       path,
-      data: await fetcher([
+      data: await fetcher([ 
         next ? `/api?path=${path}&next=${next}` : `/api?path=${path}`,
         hashedToken ?? undefined,
       ]).catch(error => ({ i, path, error })),
     }
   }
 
-  // Pool containing Promises of folder requests
+  // Pool contendo Promises de solicitações de pasta
   let pool = [genTask(0, path)]
 
-  // Map as item buffer for folders with pagination
+  // Buffer como mapa para itens de pasta com paginação
   const buf: { [k: string]: TraverseItem[] } = {}
 
-  // filter(() => true) removes gaps in the array
+  // filter(() => true) remove lacunas no array
   while (pool.filter(() => true).length > 0) {
     let info: { i: number; path: string; data: any }
     try {
       info = await Promise.race(pool.filter(() => true))
     } catch (error: any) {
       const { i, path, error: innerError } = error
-      // 4xx errors are identified as handleable errors
+      // Erros 4xx são identificados como erros tratáveis
       if (Math.floor(innerError.status / 100) === 4) {
         delete pool[i]
         yield {
@@ -222,7 +220,7 @@ export async function* traverseFolder(path: string): AsyncGenerator<TraverseItem
 
     const { i, path, data } = info
     if (!data || !data.folder) {
-      throw new Error('Path is not folder')
+      throw new Error('Caminho não é uma pasta')
     }
     delete pool[i]
 
@@ -234,23 +232,11 @@ export async function* traverseFolder(path: string): AsyncGenerator<TraverseItem
     if (data.next) {
       buf[path] = (buf[path] ?? []).concat(items)
 
-      // Append next page task to the pool at the end
-      const i = pool.length
-      pool[i] = genTask(i, path, data.next)
+      // Adicionar tarefa da próxima página ao pool no final
+      const genTaskP = genTask(i + 1, path, data.next)
+      pool.push(genTaskP)
     } else {
-      const allItems = (buf[path] ?? []).concat(items)
-      if (buf[path]) {
-        delete buf[path]
-      }
-
-      allItems
-        .filter(item => item.isFolder)
-        .forEach(item => {
-          // Append new folder tasks to the pool at the end
-          const i = pool.length
-          pool[i] = genTask(i, item.path)
-        })
-      yield* allItems
+      yield* items
     }
   }
 }
