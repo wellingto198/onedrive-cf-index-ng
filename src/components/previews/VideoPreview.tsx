@@ -124,10 +124,18 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
       </PreviewContainer>
 
       {/* Texto acima dos botões */}
-      <p style={{color: 'white' textAlign: 'center', marginTop: '1rem', fontWeight: 'bold' }}>
-        Sem áudio? Use algum dos players abaixo
-      </p>
-
+     <p style={{ color: 'white', textAlign: 'center' }}>
+    {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
+      <>
+        Sem áudio?{' '}
+        <a href="https://www.codecguide.com/download_k-lite_codec_pack_basic.htm" target="_blank" rel="noopener noreferrer" style={{ color: '#ADD8E6' }}>
+          Instale K-lite
+        </a>
+      </>
+    ) : (
+      'Sem áudio? Use algum dos players abaixo'
+    )}
+  </p>
       <DownloadBtnContainer>
         <div className="flex flex-wrap justify-center gap-2">
           <DownloadButton
