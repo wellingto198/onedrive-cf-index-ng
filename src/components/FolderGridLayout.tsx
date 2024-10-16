@@ -9,6 +9,7 @@ import { getBaseUrl } from '../utils/getBaseUrl'
 import { formatModifiedDateTime } from '../utils/fileDetails'
 import { Checkbox, ChildIcon, ChildName, Downloading } from './FileListing'
 import { getStoredToken } from '../utils/protectedRouteHandler'
+import Image from 'next/image'
 
 const ItemGrid = ({ c, path }: { c: OdFolderChildren; path: string }) => {
   const hashedToken = getStoredToken(path)
@@ -21,11 +22,13 @@ const ItemGrid = ({ c, path }: { c: OdFolderChildren; path: string }) => {
     <div className="space-y-2">
       <div className="h-32 overflow-hidden rounded border border-gray-900/10 dark:border-gray-500/30">
         {thumbnailUrl && !brokenThumbnail ? (
-          <img
+          <Image
             className="h-full w-full object-cover object-top"
             src={thumbnailUrl}
             alt={c.name}
             onError={() => setBrokenThumbnail(true)}
+            width={320}  // Ajuste conforme necessário
+            height={128} // Ajuste conforme necessário
           />
         ) : (
           <div className="relative flex h-full w-full items-center justify-center rounded-lg">
