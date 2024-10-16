@@ -142,49 +142,55 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             btnIcon="copy"
           />
 
-          {/* Texto acima dos botões */}
-     <p style={{ color: 'white', textAlign: 'center' }}>
-    {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
-      <>
-        Sem áudio?{' '}
-        <a href="https://www.codecguide.com/download_k-lite_codec_pack_basic.htm" target="_blank" rel="noopener noreferrer" style={{ color: '#ADD8E6' }}>
-          Instale K-lite
-        </a>
-      </>
-    ) : (
-      'Sem áudio? Use algum dos players abaixo'
-    )}
-  </p>
-
-          <DownloadButton
-            onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}
-            btnText="IINA"
-            btnImage="/players/iina.png"
-          />
-          <DownloadButton
-            onClickCallback={() => window.open(`vlc://${getBaseUrl()}${videoUrl}`)}
-            btnText="VLC"
-            btnImage="/players/vlc.png"
-          />
-          <DownloadButton
-            onClickCallback={() => window.open(`potplayer://${getBaseUrl()}${videoUrl}`)}
-            btnText="PotPlayer"
-            btnImage="/players/potplayer.png"
-          />
-          <DownloadButton
-            onClickCallback={() => window.open(`nplayer-http://${window?.location.hostname ?? ''}${videoUrl}`)}
-            btnText="nPlayer"
-            btnImage="/players/nplayer.png"
-          />
-          <DownloadButton
-            onClickCallback={() => window.open(`intent://${getBaseUrl()}${videoUrl}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
-            btnText="mpv-android"
-            btnImage="/players/mpv-android.png"
-          />
-        </div>
-      </DownloadBtnContainer>
+ {/* Texto acima dos botões */}
+<p style={{ color: 'white', textAlign: 'center' }}>
+  {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
+    <>
+      Sem áudio?{' '}
+      <a
+        href="https://www.codecguide.com/download_k-lite_codec_pack_basic.htm"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: '#ADD8E6' }}
+      >
+        Instale K-lite
+      </a>
     </>
-  )
-}
+  ) : (
+    'Sem áudio? Use algum dos players abaixo'
+  )}
+</p>
+
+{/* Mostrar botões de players somente em dispositivos não-Windows */}
+{typeof window !== 'undefined' && !window.navigator.platform.includes('Win') && (
+  <>
+    <DownloadButton
+      onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}
+      btnText="IINA"
+      btnImage="/players/iina.png"
+    />
+    <DownloadButton
+      onClickCallback={() => window.open(`vlc://${getBaseUrl()}${videoUrl}`)}
+      btnText="VLC"
+      btnImage="/players/vlc.png"
+    />
+    <DownloadButton
+      onClickCallback={() => window.open(`potplayer://${getBaseUrl()}${videoUrl}`)}
+      btnText="PotPlayer"
+      btnImage="/players/potplayer.png"
+    />
+    <DownloadButton
+      onClickCallback={() => window.open(`nplayer-http://${window?.location.hostname ?? ''}${videoUrl}`)}
+      btnText="nPlayer"
+      btnImage="/players/nplayer.png"
+    />
+    <DownloadButton
+      onClickCallback={() => window.open(`intent://${getBaseUrl()}${videoUrl}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
+      btnText="mpv-android"
+      btnImage="/players/mpv-android.png"
+    />
+  </>
+)}
+
 
 export default VideoPreview
