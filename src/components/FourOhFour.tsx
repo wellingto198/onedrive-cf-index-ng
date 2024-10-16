@@ -8,24 +8,24 @@ const FourOhFour: React.FC<{ errorMsg: string }> = ({ errorMsg }) => {
       </div>
       <div className="mx-auto mt-6 max-w-xl text-gray-500">
         <div className="mb-8 text-xl font-bold">
-          Oops, that&apos;s a <span className="underline decoration-red-500 decoration-wavy">four-oh-four</span>.
+          Oops, isso é um <span className="underline decoration-red-500 decoration-wavy">quatro-zero-quatro</span>.
         </div>
         <div className="mb-4 overflow-hidden break-all rounded border border-gray-400/20 bg-gray-50 p-2 font-mono text-xs dark:bg-gray-800">
           {errorMsg}
         </div>
         <div className="text-sm">
-          Press{' '}
+          Pressione{' '}
           <kbd className="rounded border border-gray-400/20 bg-gray-100 px-1 font-mono text-xs dark:bg-gray-800">
             F12
           </kbd>{' '}
-          and open devtools for more details, and report this issue to{' '}
+          e abra as ferramentas de desenvolvedor para mais detalhes, e reporte esse problema para{' '}
           <a
             className="text-blue-600 hover:text-blue-700 hover:underline"
             href="https://github.com/lyc8503/onedrive-cf-index-ng/issues"
             target="_blank"
             rel="noopener noreferrer"
           >
-            onedrive-cf-index-ng issues
+            problemas do onedrive-cf-index-ng
           </a>
           .
         </div>
