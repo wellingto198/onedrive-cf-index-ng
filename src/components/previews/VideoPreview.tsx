@@ -124,7 +124,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
       </PreviewContainer>
 
       {/* Texto acima dos botões */}
-      <p style={{ textAlign: 'center', marginTop: '1rem', fontWeight: 'bold' }}>
+      <p style={{color: 'white' textAlign: 'center', marginTop: '1rem', fontWeight: 'bold' }}>
         Sem áudio? Use algum dos players abaixo
       </p>
 
