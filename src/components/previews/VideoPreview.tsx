@@ -138,7 +138,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
               toast.success('Link Copiado.')
             }}
             btnColor="pink"
-            btnText={'Copiar Link Direct'}
+            btnText={'Copiar Link'}
             btnIcon="copy"
           />
 
