@@ -5,13 +5,13 @@ import { Listbox, Transition } from '@headlessui/react'
 
 import useLocalStorage from '../utils/useLocalStorage'
 
-export const layouts: Array<{ id: number; name: 'Grid' | 'List'; icon: IconProp }> = [
-  { id: 1, name: 'List', icon: 'th-list' },
-  { id: 2, name: 'Grid', icon: 'th' },
+export const layouts: Array<{ id: number; name: 'Grade' | 'Lista'; icon: IconProp }> = [
+  { id: 1, name: 'Lista', icon: 'th-list' },
+  { id: 2, name: 'Grade', icon: 'th' },
 ]
 
 const SwitchLayout = () => {
-  const [preferredLayout, setPreferredLayout] = useLocalStorage('preferredLayout', layouts[0])
+  const [preferredLayout, setPreferredLayout] = useLocalStorage<'Grade' | 'Lista'>('preferredLayout', layouts[0])
 
   return (
     <div className="relative w-24 flex-shrink-0 text-sm text-gray-600 dark:text-gray-300 md:w-28">
