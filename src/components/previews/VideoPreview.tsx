@@ -135,6 +135,64 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             onClickCallback={() => {
               clipboard.copy(`${getBaseUrl()}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`)
               toast.success('Link Copiado.')
+const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
+  const { asPath } = useRouter()
+  const hashedToken = getStoredToken(asPath)
+  const clipboard = useClipboard()
+
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const thumbnail = `/api/thumbnail?path=${asPath}&size=large${hashedToken ? `&odpt=${hashedToken}` : ''}`
+  const vtt = `${asPath.substring(0, asPath.lastIndexOf('.'))}.vtt`
+  const subtitle = `/api/raw?path=${vtt}${hashedToken ? `&odpt=${hashedToken}` : ''}`
+  const videoUrl = `/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`
+  const isFlv = getExtension(file.name) === 'flv'
+  
+  const { loading, error, result: mpegts } = useAsync(async () => {
+    if (isFlv) {
+      return (await import('mpegts.js')).default
+    }
+  }, [isFlv])
+
+  return (
+    <>
+      <CustomEmbedLinkMenu path={asPath} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      <PreviewContainer>
+        {error ? (
+          <FourOhFour errorMsg={error.message} />
+        ) : loading && isFlv ? (
+          <Loading loadingText={'Loading FLV extension...'} />
+        ) : (
+          <VideoPlayer
+            videoName={file.name}
+            videoUrl={videoUrl}
+            width={file.video?.width}
+            height={file.video?.height}
+            thumbnail={thumbnail}
+            subtitle={subtitle}
+            isFlv={isFlv}
+            mpegts={mpegts}
+          />
+        )}
+      </PreviewContainer>
+
+      {/* Texto acima dos botões */}
+      <p style={{ textAlign: 'center', marginTop: '1rem', fontWeight: 'bold' }}>
+        Sem áudio? Use algum dos players abaixo
+      </p>
+
+      <DownloadBtnContainer>
+        <div className="flex flex-wrap justify-center gap-2">
+          <DownloadButton
+            onClickCallback={() => window.open(videoUrl)}
+            btnColor="blue"
+            btnText={'Baixar'}
+            btnIcon="file-download"
+          />
+          <DownloadButton
+            onClickCallback={() => {
+              clipboard.copy(`${getBaseUrl()}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`)
+              toast.success('Link Copiado.')
             }}
             btnColor="pink"
             btnText={'Copiar Link Direct'}
