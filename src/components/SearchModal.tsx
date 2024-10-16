@@ -211,7 +211,7 @@ export default function SearchModal({
                   type="text"
                   id="search-box"
                   className="w-full bg-transparent focus:outline-none focus-visible:outline-none"
-                  placeholder={'Buscar ...'}
+                  placeholder={'Buscar...'}
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                 />
@@ -224,7 +224,7 @@ export default function SearchModal({
                 {results.loading && (
                   <div className="px-4 py-12 text-center text-sm font-medium">
                     <LoadingIcon className="svg-inline--fa mr-2 inline-block h-4 w-4 animate-spin" />
-                    <span>{'Carregando ...'}</span>
+                    <span>{'Carregando...'}</span>
                   </div>
                 )}
                 {results.error && (
