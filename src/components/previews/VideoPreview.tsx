@@ -32,7 +32,7 @@ const VideoPlayer: FC<{
   mpegts: any
 }> = ({ videoName, videoUrl, width, height, thumbnail, subtitle, isFlv, mpegts }) => {
   useEffect(() => {
-    // Really really hacky way to inject subtitles as file blobs into the video element
+    // Really hacky way to inject subtitles as file blobs into the video element
     axios
       .get(subtitle, { responseType: 'blob' })
       .then(resp => {
@@ -45,7 +45,7 @@ const VideoPlayer: FC<{
 
     if (isFlv) {
       const loadFlv = () => {
-        // Really hacky way to get the exposed video element from Plyr
+        // Hacky way to get the exposed video element from Plyr
         const video = document.getElementById('plyr')
         const flv = mpegts.createPlayer({ url: videoUrl, type: 'flv' })
         flv.attachMediaElement(video)
@@ -55,7 +55,6 @@ const VideoPlayer: FC<{
     }
   }, [videoUrl, isFlv, mpegts, subtitle])
 
-  // Common plyr configs, including the video source and plyr options
   const plyrSource = {
     type: 'video',
     title: videoName,
@@ -67,7 +66,6 @@ const VideoPlayer: FC<{
     fullscreen: { iosNative: true },
   }
   if (!isFlv) {
-    // If the video is not in flv format, we can use the native plyr and add sources directly with the video URL
     plyrSource['sources'] = [{ src: videoUrl }]
   }
   return <Plyr id="plyr" source={plyrSource as Plyr.SourceInfo} options={plyrOptions} />
@@ -80,14 +78,14 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
 
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // OneDrive generates thumbnails for its video files, we pick the thumbnail with the highest resolution
+  // OneDrive generates thumbnails for its video files, pick the highest resolution
   const thumbnail = `/api/thumbnail?path=${asPath}&size=large${hashedToken ? `&odpt=${hashedToken}` : ''}`
 
-  // We assume subtitle files are beside the video with the same name, only webvtt '.vtt' files are supported
+  // Assume subtitle files are beside the video with the same name, only webvtt '.vtt' files supported
   const vtt = `${asPath.substring(0, asPath.lastIndexOf('.'))}.vtt`
   const subtitle = `/api/raw?path=${vtt}${hashedToken ? `&odpt=${hashedToken}` : ''}`
 
-  // We also format the raw video file for the in-browser player as well as all other players
+  // Format raw video file for in-browser player as well as other players
   const videoUrl = `/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`
 
   const isFlv = getExtension(file.name) === 'flv'
@@ -123,7 +121,6 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
         )}
       </PreviewContainer>
 
-      
       <DownloadBtnContainer>
         <div className="flex flex-wrap justify-center gap-2">
           <DownloadButton
@@ -141,59 +138,63 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             btnText={'Copiar Link'}
             btnIcon="copy"
           />
+        </div>
 
- {/* Texto acima dos botões */}
-<p style={{ color: 'white', textAlign: 'center' }}>
-  {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
-    <>
-      Sem áudio?{' '}
-      <a
-        href="https://www.codecguide.com/download_k-lite_codec_pack_basic.htm"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ color: '#ADD8E6' }}
-      >
-        Instale K-lite
-      </a>
+        {/* Texto acima dos botões */}
+        <p style={{ color: 'white', textAlign: 'center' }}>
+          {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
+            <>
+              Sem áudio?{' '}
+              <a
+                href="https://www.codecguide.com/download_k-lite_codec_pack_basic.htm"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#ADD8E6' }}
+              >
+                Instale K-lite
+              </a>
+            </>
+          ) : (
+            'Sem áudio? Use algum dos players abaixo'
+          )}
+        </p>
+
+        {/* Espaço adicionado entre o texto e os botões */}
+        <div style={{ marginBottom: '20px' }} />
+
+        {/* Mostrar botões de players somente em dispositivos não-Windows */}
+        {typeof window !== 'undefined' && !window.navigator.platform.includes('Win') && (
+          <div style={{ textAlign: 'center' }}>
+            <DownloadButton
+              onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}
+              btnText="IINA"
+              btnImage="/players/iina.png"
+            />
+            <DownloadButton
+              onClickCallback={() => window.open(`vlc://${getBaseUrl()}${videoUrl}`)}
+              btnText="VLC"
+              btnImage="/players/vlc.png"
+            />
+            <DownloadButton
+              onClickCallback={() => window.open(`potplayer://${getBaseUrl()}${videoUrl}`)}
+              btnText="PotPlayer"
+              btnImage="/players/potplayer.png"
+            />
+            <DownloadButton
+              onClickCallback={() => window.open(`nplayer-http://${window?.location.hostname ?? ''}${videoUrl}`)}
+              btnText="nPlayer"
+              btnImage="/players/nplayer.png"
+            />
+            <DownloadButton
+              onClickCallback={() => window.open(`intent://${getBaseUrl()}${videoUrl}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
+              btnText="mpv-android"
+              btnImage="/players/mpv-android.png"
+            />
+          </div> /* Closing div added here */
+        )}
+      </DownloadBtnContainer>
     </>
-  ) : (
-    'Sem áudio? Use algum dos players abaixo'
-  )}
-</p>
-
-{/* Espaço adicionado entre o texto e os botões */}
-<div style={{ marginBottom: '20px' }} />
-
-{/* Mostrar botões de players somente em dispositivos não-Windows */}
-{typeof window !== 'undefined' && !window.navigator.platform.includes('Win') && (
-  <div style={{ textAlign: 'center' }}>
-    <DownloadButton
-      onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}
-      btnText="IINA"
-      btnImage="/players/iina.png"
-    />
-    <DownloadButton
-      onClickCallback={() => window.open(`vlc://${getBaseUrl()}${videoUrl}`)}
-      btnText="VLC"
-      btnImage="/players/vlc.png"
-    />
-    <DownloadButton
-      onClickCallback={() => window.open(`potplayer://${getBaseUrl()}${videoUrl}`)}
-      btnText="PotPlayer"
-      btnImage="/players/potplayer.png"
-    />
-    <DownloadButton
-      onClickCallback={() => window.open(`nplayer-http://${window?.location.hostname ?? ''}${videoUrl}`)}
-      btnText="nPlayer"
-      btnImage="/players/nplayer.png"
-    />
-    <DownloadButton
-      onClickCallback={() => window.open(`intent://${getBaseUrl()}${videoUrl}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
-      btnText="mpv-android"
-      btnImage="/players/mpv-android.png"
-    />
-  </div>
-)}
-
+  )
+}
 
 export default VideoPreview
