@@ -160,11 +160,13 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
     'Sem áudio? Use algum dos players abaixo'
   )}
 </p>
-<br>
-</br>
+
+{/* Espaço adicionado entre o texto e os botões */}
+<div style={{ marginBottom: '20px' }} />
+
 {/* Mostrar botões de players somente em dispositivos não-Windows */}
 {typeof window !== 'undefined' && !window.navigator.platform.includes('Win') && (
-  <>
+  <div style={{ textAlign: 'center' }}>
     <DownloadButton
       onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}
       btnText="IINA"
@@ -190,7 +192,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
       btnText="mpv-android"
       btnImage="/players/mpv-android.png"
     />
-  </>
+  </div>
 )}
 
 
