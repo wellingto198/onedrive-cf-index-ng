@@ -11,10 +11,10 @@ module.exports = {
 
   // [OPTIONAL] This is the website icon to the left of the title inside the navigation bar. It should be placed under the
   // /public directory of your GitHub project (not your OneDrive folder!), and referenced here by its relative path to /public.
-  icon: '/icons/128.png',
+  icon: '/icons/icon 128.png',
 
   // The name of your website. Present alongside your icon.
-  title: "DW WEB TV",
+  title: "WEB TV",
 
   // The folder that you are to share publicly with onedrive-cf-index-ng. Use '/' if you want to share your root folder.
   baseDirectory: process.env.BASE_DIRECTORY || '/',
