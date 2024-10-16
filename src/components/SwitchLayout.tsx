@@ -5,6 +5,10 @@ import { Listbox, Transition } from '@headlessui/react'
 
 import useLocalStorage from '../utils/useLocalStorage'
 
+// Certifique-se de importar os componentes FolderGridLayout e FolderListLayout
+import FolderGridLayout from './FolderGridLayout'  // Ajuste o caminho conforme necessário
+import FolderListLayout from './FolderListLayout'  // Ajuste o caminho conforme necessário
+
 export const layouts: Array<{ id: number; name: 'Grade' | 'Lista'; icon: IconProp }> = [
   { id: 1, name: 'Lista', icon: 'th-list' },
   { id: 2, name: 'Grade', icon: 'th' },
