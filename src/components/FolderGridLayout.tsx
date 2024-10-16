@@ -11,19 +11,16 @@ import { Checkbox, ChildIcon, ChildName, Downloading } from './FileListing'
 import { getStoredToken } from '../utils/protectedRouteHandler'
 
 const GridItem = ({ c, path }: { c: OdFolderChildren; path: string }) => {
-  // We use the generated medium thumbnail for rendering preview images (excluding folders)
   const hashedToken = getStoredToken(path)
   const thumbnailUrl =
     'folder' in c ? null : `/api/thumbnail?path=${path}&size=medium${hashedToken ? `&odpt=${hashedToken}` : ''}`
 
-  // Some thumbnails are broken, so we check for onerror event in the image component
   const [brokenThumbnail, setBrokenThumbnail] = useState(false)
 
   return (
     <div className="space-y-2">
       <div className="h-32 overflow-hidden rounded border border-gray-900/10 dark:border-gray-500/30">
         {thumbnailUrl && !brokenThumbnail ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             className="h-full w-full object-cover object-top"
             src={thumbnailUrl}
@@ -70,7 +67,6 @@ const FolderGridLayout = ({
   const clipboard = useClipboard()
   const hashedToken = getStoredToken(path)
 
-  // Get item path from item name
   const getItemPath = (name: string) => `${path === '/' ? '' : path}/${encodeURIComponent(name)}`
 
   return (
@@ -82,24 +78,24 @@ const FolderGridLayout = ({
             checked={totalSelected}
             onChange={toggleTotalSelected}
             indeterminate={true}
-            title={'Select all files'}
+            title={'Selecionar todos os arquivos'}
           />
           <button
-            title={'Copy selected files permalink'}
+            title={'Copiar link permanente dos arquivos selecionados'}
             className="cursor-pointer rounded p-1.5 hover:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-400 disabled:hover:bg-white dark:hover:bg-gray-600 disabled:dark:text-gray-600 disabled:hover:dark:bg-gray-900"
             disabled={totalSelected === 0}
             onClick={() => {
               clipboard.copy(handleSelectedPermalink(getBaseUrl()))
-              toast.success('Copied selected files permalink.')
+              toast.success('Link permanente dos arquivos selecionados copiado.')
             }}
           >
             <FontAwesomeIcon icon={['far', 'copy']} size="lg" />
           </button>
           {totalGenerating ? (
-            <Downloading title={'Downloading selected files, refresh page to cancel'} style="p-1.5" />
+            <Downloading title={'Baixando arquivos selecionados, atualize a página para cancelar'} style="p-1.5" />
           ) : (
             <button
-              title={'Download selected files'}
+              title={'Baixar arquivos selecionados'}
               className="cursor-pointer rounded p-1.5 hover:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-400 disabled:hover:bg-white dark:hover:bg-gray-600 disabled:dark:text-gray-600 disabled:hover:dark:bg-gray-900"
               disabled={totalSelected === 0}
               onClick={handleSelectedDownload}
@@ -120,20 +116,20 @@ const FolderGridLayout = ({
               {c.folder ? (
                 <div>
                   <span
-                    title={'Copy folder permalink'}
+                    title={'Copiar link permanente da pasta'}
                     className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                     onClick={() => {
                       clipboard.copy(`${getBaseUrl()}${getItemPath(c.name)}`)
-                      toast('Copied folder permalink.', { icon: '👌' })
+                      toast('Link permanente da pasta copiado.', { icon: '👌' })
                     }}
                   >
                     <FontAwesomeIcon icon={['far', 'copy']} />
                   </span>
                   {folderGenerating[c.id] ? (
-                    <Downloading title={'Downloading folder, refresh page to cancel'} style="px-1.5 py-1" />
+                    <Downloading title={'Baixando pasta, atualize a página para cancelar'} style="px-1.5 py-1" />
                   ) : (
                     <span
-                      title={'Download folder'}
+                      title={'Baixar pasta'}
                       className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                       onClick={handleFolderDownload(getItemPath(c.name), c.id, c.name)}
                     >
@@ -144,7 +140,7 @@ const FolderGridLayout = ({
               ) : (
                 <div>
                   <span
-                    title={'Copy raw file permalink'}
+                    title={'Copiar link do arquivo'}
                     className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                     onClick={() => {
                       clipboard.copy(
@@ -152,13 +148,13 @@ const FolderGridLayout = ({
                           hashedToken ? `&odpt=${hashedToken}` : ''
                         }`
                       )
-                      toast.success('Copied raw file permalink.')
+                      toast.success('Link do arquivo copiado.')
                     }}
                   >
                     <FontAwesomeIcon icon={['far', 'copy']} />
                   </span>
                   <a
-                    title={'Download file'}
+                    title={'Baixar arquivo'}
                     className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                     href={`${getBaseUrl()}/api/raw?path=${getItemPath(c.name)}${
                       hashedToken ? `&odpt=${hashedToken}` : ''
@@ -179,7 +175,7 @@ const FolderGridLayout = ({
                 <Checkbox
                   checked={selected[c.id] ? 2 : 0}
                   onChange={() => toggleItemSelected(c.id)}
-                  title={'Select file'}
+                  title={'Selecionar arquivo'}
                 />
               )}
             </div>
