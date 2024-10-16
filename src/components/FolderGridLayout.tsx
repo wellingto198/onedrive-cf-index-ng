@@ -10,7 +10,7 @@ import { formatModifiedDateTime } from '../utils/fileDetails'
 import { Checkbox, ChildIcon, ChildName, Downloading } from './FileListing'
 import { getStoredToken } from '../utils/protectedRouteHandler'
 
-const GridItem = ({ c, path }: { c: OdFolderChildren; path: string }) => {
+const ItemGrid = ({ c, path }: { c: OdFolderChildren; path: string }) => {
   const hashedToken = getStoredToken(path)
   const thumbnailUrl =
     'folder' in c ? null : `/api/thumbnail?path=${path}&size=medium${hashedToken ? `&odpt=${hashedToken}` : ''}`
@@ -50,7 +50,7 @@ const GridItem = ({ c, path }: { c: OdFolderChildren; path: string }) => {
   )
 }
 
-const FolderGridLayout = ({
+const LayoutGradeDePasta = ({
   path,
   folderChildren,
   selected,
@@ -181,7 +181,7 @@ const FolderGridLayout = ({
             </div>
 
             <Link href={getItemPath(c.name)} passHref>
-              <GridItem c={c} path={getItemPath(c.name)} />
+              <ItemGrid c={c} path={getItemPath(c.name)} />
             </Link>
           </div>
         ))}
@@ -190,4 +190,4 @@ const FolderGridLayout = ({
   )
 }
 
-export default FolderGridLayout
+export default LayoutGradeDePasta
