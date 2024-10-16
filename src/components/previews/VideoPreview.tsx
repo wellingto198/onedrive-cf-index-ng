@@ -160,7 +160,8 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
     'Sem áudio? Use algum dos players abaixo'
   )}
 </p>
-
+<br>
+</br>
 {/* Mostrar botões de players somente em dispositivos não-Windows */}
 {typeof window !== 'undefined' && !window.navigator.platform.includes('Win') && (
   <>
