@@ -59,6 +59,13 @@ const SwitchLayout = () => {
           </Listbox.Options>
         </Transition>
       </Listbox>
+
+      {/* Renderizar layout com base no valor selecionado */}
+      {preferredLayout.name === 'Grade' ? (
+        <FolderGridLayout {...folderProps} />
+      ) : (
+        <FolderListLayout {...folderProps} />
+      )}
     </div>
   )
 }
