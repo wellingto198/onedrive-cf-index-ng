@@ -52,10 +52,6 @@ links: [
     name: 'Telegram',
     link: 'https://t.me/DWWebTV',
   }
-  {
-    name: 'Tiktok',
-    link: 'https://www.tiktok.com/@valeyard.dw',
-  }
 ],
 
   // This is a day.js-style datetime format string to format datetimes in the app. Ref to
