@@ -137,6 +137,8 @@ export const Downloading: FC<{ title: string; style: string }> = ({ title, style
   return (
     <span title={title} className={`${style} rounded`} role="status">
       <LoadingIcon
+        // Usa o tema far do fontawesome via classe `svg-inline--fa` para obter o estilo `vertical-align` apenas
+        // para o alinhamento consistente do ícone, pois a classe `align-*` não pode satisfazê-lo
         className="svg-inline--fa inline-block h-4 w-4 animate-spin"
       />
     </span>
@@ -160,6 +162,7 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
   const { data, error, size, setSize } = useProtectedSWRInfinite(path)
 
   if (error) {
+    // Se o erro incluir 403, significa que o usuário não completou a configuração inicial, redireciona para a página de OAuth
     if (error.status === 403) {
       router.push('/onedrive-oauth/step-1')
       return <div />
@@ -188,10 +191,16 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
   const onlyOnePage = data && typeof data[0].next === 'undefined'
 
   if ('folder' in responses[0]) {
+    // Expande a lista de retornos da API em dados de arquivo achatados
     const folderChildren = [].concat(...responses.map(r => r.folder.value)) as OdFolderObject['value']
 
+    // Encontra o arquivo README.md para renderizar
+    const readmeFile = folderChildren.find(c => c.name.toLowerCase() === 'readme.md')
+
+    // Função auxiliar para filtrar arquivos
     const getFiles = () => folderChildren.filter(c => !c.folder && c.name !== '.password')
 
+    // Seleção de arquivos
     const genTotalSelected = (selected: { [key: string]: boolean }) => {
       const selectInfo = getFiles().map(c => Boolean(selected[c.id]))
       const [hasT, hasF] = [selectInfo.some(i => i), selectInfo.some(i => !i)]
@@ -215,17 +224,4 @@ const FileListing: FC<{ query?: ParsedUrlQuery }> = ({ query }) => {
         setSelected({})
         setTotalSelected(0)
       } else {
-        setSelected(Object.fromEntries(getFiles().map(f => [f.id, true])))
-        setTotalSelected(2)
-      }
-    }
-
-    return (
-      <div>
-        {/* Renderize os filhos da pasta, botões e outros elementos do componente */}
-      </div>
-    )
-  }
-
-  return <div /> // Substitua com o código para lidar com arquivos fora de uma pasta
-}
+        setSelected(Object.fromEntries(getFiles().map
