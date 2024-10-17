@@ -51,6 +51,9 @@ links: [
   {
     name: 'Telegram',
     link: 'https://t.me/DWWebTV',
+  }, {
+    name: 'tiktok',
+    link: 'https://www.tiktok.com/@valeyard.dw?_t=8qcWjWeYKSz&_r=1',
   }
 ],
 
