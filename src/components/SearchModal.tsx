@@ -16,20 +16,9 @@ import { getFileIcon } from '../utils/getFileIcon'
 import { fetcher } from '../utils/fetchWithSWR'
 import siteConfig from '../../config/site.config'
 
-/**
- * Extract the searched item's path in field 'parentReference' and convert it to the
- * absolute path
- *
- * @param path Path returned from the parentReference field of the driveItem
- * @returns The absolute path of the driveItem in the search result
- */
 function mapAbsolutePath(path: string): string {
-  // path is in the format of '/drive/root:/path/to/file', if baseDirectory is '/' then we split on 'root:',
-  // otherwise we split on the user defined 'baseDirectory'
   const absolutePath = path.split(siteConfig.baseDirectory === '/' ? 'root:' : siteConfig.baseDirectory)
-  // path returned by the API may contain #, by doing a decodeURIComponent and then encodeURIComponent we can
-  // replace URL sensitive characters such as the # with %23
-  return absolutePath.length > 1 // solve https://github.com/spencerwooo/onedrive-vercel-index/issues/539
+  return absolutePath.length > 1
     ? absolutePath[1]
         .split('/')
         .map(p => encodeURIComponent(decodeURIComponent(p)))
@@ -37,25 +26,16 @@ function mapAbsolutePath(path: string): string {
     : ''
 }
 
-/**
- * Implements a debounced search function that returns a promise that resolves to an array of
- * search results.
- *
- * @returns A react hook for a debounced async search of the drive
- */
 function useDriveItemSearch() {
   const [query, setQuery] = useState('')
   const searchDriveItem = async (q: string) => {
     const { data } = await axios.get<OdSearchResult>(`/api/search?q=${q}`)
 
-    // Map parentReference to the absolute path of the search result
     data.map(item => {
       item['path'] =
         'path' in item.parentReference
-          ? // OneDrive International have the path returned in the parentReference field
-            `${mapAbsolutePath(item.parentReference.path)}/${encodeURIComponent(item.name)}`
-          : // OneDrive for Business/Education does not, so we need extra steps here
-            ''
+          ? `${mapAbsolutePath(item.parentReference.path)}/${encodeURIComponent(item.name)}`
+          : ''
     })
 
     return data
@@ -101,7 +81,7 @@ function SearchResultItemTemplate({
         <div className="text-sm font-medium leading-8">{driveItem.name}</div>
         <div
           className={`overflow-hidden truncate font-mono text-xs opacity-60 ${
-            itemDescription === 'Loading ...' && 'animate-pulse'
+            itemDescription === 'Carregando...' && 'animate-pulse'
           }`}
         >
           {itemDescription}
@@ -129,7 +109,7 @@ function SearchResultItemLoadRemote({ result }: { result: OdSearchResult[number]
   }
   if (!data) {
     return (
-      <SearchResultItemTemplate driveItem={result} driveItemPath={''} itemDescription={'Loading ...'} disabled={true} />
+      <SearchResultItemTemplate driveItem={result} driveItemPath={''} itemDescription={'Carregando...'} disabled={true} />
     )
   }
 
@@ -146,10 +126,8 @@ function SearchResultItemLoadRemote({ result }: { result: OdSearchResult[number]
 
 function SearchResultItem({ result }: { result: OdSearchResult[number] }) {
   if (result.path === '') {
-    // path is empty, which means we need to fetch the parentReference to get the path
     return <SearchResultItemLoadRemote result={result} />
   } else {
-    // path is not an empty string in the search result, such that we can directly render the component as is
     const driveItemPath = decodeURIComponent(result.path)
     return (
       <SearchResultItemTemplate
@@ -211,7 +189,7 @@ export default function SearchModal({
                   type="text"
                   id="search-box"
                   className="w-full bg-transparent focus:outline-none focus-visible:outline-none"
-                  placeholder={'Search ...'}
+                  placeholder={'Pesquisar...'}
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                 />
@@ -224,16 +202,16 @@ export default function SearchModal({
                 {results.loading && (
                   <div className="px-4 py-12 text-center text-sm font-medium">
                     <LoadingIcon className="svg-inline--fa mr-2 inline-block h-4 w-4 animate-spin" />
-                    <span>{'Loading ...'}</span>
+                    <span>{'Carregando...'}</span>
                   </div>
                 )}
                 {results.error && (
-                  <div className="px-4 py-12 text-center text-sm font-medium">{`Error: ${results.error.message}`}</div>
+                  <div className="px-4 py-12 text-center text-sm font-medium">{`Erro: ${results.error.message}`}</div>
                 )}
                 {results.result && (
                   <>
                     {results.result.length === 0 ? (
-                      <div className="px-4 py-12 text-center text-sm font-medium">{'Nothing here.'}</div>
+                      <div className="px-4 py-12 text-center text-sm font-medium">{'Nada por aqui.'}</div>
                     ) : (
                       results.result.map(result => <SearchResultItem key={result.id} result={result} />)
                     )}
