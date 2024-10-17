@@ -120,7 +120,7 @@ const FolderListLayout = ({
                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
                 onClick={() => {
                   clipboard.copy(`${getBaseUrl()}${`${path === '/' ? '' : path}/${encodeURIComponent(c.name)}`}`)
-                  toast('Copied folder permalink.', { icon: '👌' })
+                  toast('Link permanente da pasta copiado.', { icon: '👌' })
                 }}
               >
                 <FontAwesomeIcon icon={['far', 'copy']} />
@@ -149,7 +149,7 @@ const FolderListLayout = ({
                   clipboard.copy(
                     `${getBaseUrl()}/api/raw?path=${getItemPath(c.name)}${hashedToken ? `&odpt=${hashedToken}` : ''}`
                   )
-                  toast.success('Copied raw file permalink.')
+                  toast.success('Link permanente do arquivo raw copiado.')
                 }}
               >
                 <FontAwesomeIcon icon={['far', 'copy']} />
