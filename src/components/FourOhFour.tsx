@@ -1,6 +1,13 @@
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 
 const FourOhFour: React.FC<{ errorMsg: string }> = ({ errorMsg }) => {
+  const router = useRouter()
+
+  const handleGoHome = () => {
+    router.push('/')
+  }
+
   return (
     <div className="my-12">
       <div className="mx-auto w-1/3">
@@ -28,6 +35,14 @@ const FourOhFour: React.FC<{ errorMsg: string }> = ({ errorMsg }) => {
             onedrive-cf-index-ng issues
           </a>
           .
+        </div>
+        <div className="mt-6">
+          <button
+            onClick={handleGoHome}
+            className="rounded bg-blue-600 text-white py-2 px-4 hover:bg-blue-700 transition"
+          >
+            Voltar ao Início
+          </button>
         </div>
       </div>
     </div>
