@@ -4,8 +4,9 @@ const createFooterMarkup = () => {
   return {
     __html: `
       ${config.footer}
-      <div style="position: absolute; right: 10px;">
-        <script id="_waupby">var _wau = _wau || []; _wau.push(["dynamic", "ql0bt5zbr0", "pby", "434343ffffff", "small"]);</script><script async src="//waust.at/d.js"></script>
+      <div style="position: absolute; top: 0; right: 10px;">
+        <script id="_waupby">var _wau = _wau || []; _wau.push(["dynamic", "ql0bt5zbr0", "pby", "434343ffffff", "small"]);</script>
+        <script async src="//waust.at/d.js"></script>
       </div>
     `,
   }
