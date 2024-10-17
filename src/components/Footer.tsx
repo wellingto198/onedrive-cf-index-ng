@@ -2,7 +2,11 @@ import config from '../../config/site.config'
 
 const createFooterMarkup = () => {
   return {
-    __html: config.footer,
+    __html: `
+      ${config.footer}
+      <script id="_wauv9i">var _wau = _wau || []; _wau.push(["small", "6mzocwh7kd", "v9i"]);\u003C/script>
+      <script async src="//waust.at/s.js">\u003C/script>
+    `,
   }
 }
 
