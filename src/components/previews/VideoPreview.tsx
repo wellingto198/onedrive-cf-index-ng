@@ -31,7 +31,8 @@ const VideoPlayer: FC<{
   isFlv: boolean
   mpegts: any
 }> = ({ videoName, videoUrl, width, height, thumbnail, subtitle, isFlv, mpegts }) => {
-  useEffect(() => {
+  
+useEffect(() => {
   // Carregar a legenda automaticamente quando disponível
   axios
     .get(subtitle, { responseType: 'blob' })
@@ -39,23 +40,10 @@ const VideoPlayer: FC<{
       const track = document.querySelector('track')
       if (track) {
         track.setAttribute('src', URL.createObjectURL(resp.data))
-        track.setAttribute('default', 'true') // Define como default
-
-        // Manipular o Plyr para ativar as legendas automaticamente
-        const videoElement = document.querySelector('video')
-        if (videoElement) {
-          const player = new Plyr(videoElement)
-          const textTracks = videoElement.textTracks
-
-          // Ativar legendas automaticamente se houver track
-          if (textTracks && textTracks.length > 0) {
-            textTracks[0].mode = 'showing' // Forçar a exibição das legendas
-          }
-
-          // Ativar legendas no Plyr
-          player.on('ready', () => {
-            player.captions.active = true // Ativar as legendas no Plyr
-          })
+        track.setAttribute('default', 'true') // Garantir que a legenda seja padrão
+        const video = document.querySelector('video')
+        if (video) {
+          video.textTracks[0].mode = 'showing' // Forçar a exibição automática das legendas
         }
       }
     })
