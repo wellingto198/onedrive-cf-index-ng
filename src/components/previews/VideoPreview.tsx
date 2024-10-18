@@ -75,7 +75,7 @@ const plyrOptions: Plyr.Options = {
   ratio: `${width ?? 16}:${height ?? 9}`,
   fullscreen: { iosNative: true },
   captions: { active: true, update: true }, // Forçar legendas ativas
-  controls: ['play', 'duration', 'progress', 'current-time', 'captions', 'fullscreen']
+  controls: ['play', 'current-time', 'progress', 'duration', 'captions', 'fullscreen']
 }
 
 
