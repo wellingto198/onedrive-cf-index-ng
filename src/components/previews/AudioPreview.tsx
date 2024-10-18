@@ -103,10 +103,6 @@ const AudioPreview: FC<{ file: OdFileObject }> = ({ file }) => {
   </div>
 </PreviewContainer>
 
-<DownloadBtnContainer>
-  <DownloadButtonGroup />
-</DownloadBtnContainer>
-
 
       <DownloadBtnContainer>
         <DownloadButtonGroup />
