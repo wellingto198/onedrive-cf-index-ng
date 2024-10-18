@@ -22,9 +22,11 @@ const Auth: FC<{ redirect: string }> = ({ redirect }) => {
       <div className="text-lg font-bold text-gray-900 dark:text-gray-100">{'Entrar com senha'}</div>
 
       <p className="text-sm font-medium text-gray-500">
-        {'Esta pasta está protegida por senha.🔐' +
-          'O Que Você Está Fazendo Aqui ?🤨'}
-      </p>
+  Esta pasta está protegida por senha.🔐
+  <br />
+  O Que Você Está Fazendo Aqui?🤨
+</p>
+
 
       <div className="flex items-center space-x-2">
         <input
