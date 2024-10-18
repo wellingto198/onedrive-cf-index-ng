@@ -1,4 +1,56 @@
-<PreviewContainer>
+import type { OdFileObject } from '../../types'
+import { FC, useEffect, useRef, useState } from 'react'
+
+import ReactAudioPlayer from 'react-audio-player'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useRouter } from 'next/router'
+
+import DownloadButtonGroup from '../DownloadBtnGtoup'
+import { DownloadBtnContainer, PreviewContainer } from './Containers'
+import { LoadingIcon } from '../Loading'
+import { formatModifiedDateTime } from '../../utils/fileDetails'
+import { getStoredToken } from '../../utils/protectedRouteHandler'
+
+enum PlayerState {
+  Loading,
+  Ready,
+  Playing,
+  Paused,
+}
+
+const AudioPreview: FC<{ file: OdFileObject }> = ({ file }) => {
+  const { asPath } = useRouter()
+  const hashedToken = getStoredToken(asPath)
+
+  const rapRef = useRef<ReactAudioPlayer>(null)
+  const [playerStatus, setPlayerStatus] = useState(PlayerState.Loading)
+  const [playerVolume, setPlayerVolume] = useState(1)
+
+  // Render audio thumbnail, and also check for broken thumbnails
+  const thumbnail = `/api/thumbnail?path=${asPath}&size=medium${hashedToken ? `&odpt=${hashedToken}` : ''}`
+  const [brokenThumbnail, setBrokenThumbnail] = useState(false)
+
+  useEffect(() => {
+    // Manually get the HTML audio element and set onplaying event.
+    // - As the default event callbacks provided by the React component does not guarantee playing state to be set
+    // - properly when the user seeks through the timeline or the audio is buffered.
+    const rap = rapRef.current?.audioEl.current
+    if (rap) {
+      rap.oncanplay = () => setPlayerStatus(PlayerState.Ready)
+      rap.onended = () => setPlayerStatus(PlayerState.Paused)
+      rap.onpause = () => setPlayerStatus(PlayerState.Paused)
+      rap.onplay = () => setPlayerStatus(PlayerState.Playing)
+      rap.onplaying = () => setPlayerStatus(PlayerState.Playing)
+      rap.onseeking = () => setPlayerStatus(PlayerState.Loading)
+      rap.onwaiting = () => setPlayerStatus(PlayerState.Loading)
+      rap.onerror = () => setPlayerStatus(PlayerState.Paused)
+      rap.onvolumechange = () => setPlayerVolume(rap.volume)
+    }
+  }, [])
+
+  return (
+    <>
+      <PreviewContainer>
   <div className="flex flex-col space-y-4 md:flex-row md:space-x-4">
     <div className="relative flex aspect-[2/1] w-full items-center justify-center rounded-full bg-gray-100 transition-all duration-75 dark:bg-gray-700 md:w-48">
       <div
@@ -51,3 +103,12 @@
     </div>
   </div>
 </PreviewContainer>
+
+      <DownloadBtnContainer>
+        <DownloadButtonGroup />
+      </DownloadBtnContainer>
+    </>
+  )
+}
+
+export default AudioPreview
