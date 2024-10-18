@@ -32,43 +32,51 @@ const VideoPlayer: FC<{
   mpegts: any
 }> = ({ videoName, videoUrl, width, height, thumbnail, subtitle, isFlv, mpegts }) => {
   useEffect(() => {
-    // Really hacky way to inject subtitles as file blobs into the video element
-    axios
-      .get(subtitle, { responseType: 'blob' })
-      .then(resp => {
-        const track = document.querySelector('track')
-        track?.setAttribute('src', URL.createObjectURL(resp.data))
-      })
-      .catch(() => {
-        console.log('Could not load subtitle.')
-      })
-
-    if (isFlv) {
-      const loadFlv = () => {
-        // Hacky way to get the exposed video element from Plyr
-        const video = document.getElementById('plyr')
-        const flv = mpegts.createPlayer({ url: videoUrl, type: 'flv' })
-        flv.attachMediaElement(video)
-        flv.load()
+  // Carregar a legenda automaticamente quando disponível
+  axios
+    .get(subtitle, { responseType: 'blob' })
+    .then(resp => {
+      const track = document.querySelector('track')
+      if (track) {
+        track.setAttribute('src', URL.createObjectURL(resp.data))
+        track.setAttribute('default', 'true') // Garantir que a legenda seja padrão
+        const video = document.querySelector('video')
+        if (video) {
+          video.textTracks[0].mode = 'showing' // Forçar a exibição automática das legendas
+        }
       }
-      loadFlv()
+    })
+    .catch(() => {
+      console.log('Could not load subtitle.')
+    })
+
+  if (isFlv) {
+    const loadFlv = () => {
+      const video = document.getElementById('plyr')
+      const flv = mpegts.createPlayer({ url: videoUrl, type: 'flv' })
+      flv.attachMediaElement(video)
+      flv.load()
     }
-  }, [videoUrl, isFlv, mpegts, subtitle])
+    loadFlv()
+  }
+}, [videoUrl, isFlv, mpegts, subtitle])
+
 
   const plyrSource = {
   type: 'video',
   title: videoName,
   poster: thumbnail,
-  // Garantir que as legendas sejam ativadas automaticamente
+  // Garantir que as legendas sejam ativadas automaticamente e que a track tenha default true
   tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
 }
 
-  const plyrOptions: Plyr.Options = {
+const plyrOptions: Plyr.Options = {
   ratio: `${width ?? 16}:${height ?? 9}`,
   fullscreen: { iosNative: true },
-  captions: { active: true, update: true }, // Ativar legendas por padrão
-  controls: ['play', 'progress', 'current-time', 'duration', 'captions', 'fullscreen'], // Adicionar controle de legendas e exibir tempo
+  captions: { active: true, update: true }, // Forçar legendas ativas
+  controls: ['play', 'progress', 'current-time', 'duration', 'captions', 'fullscreen'], // Controle de legendas e tempo
 }
+
 
 
   if (!isFlv) {
