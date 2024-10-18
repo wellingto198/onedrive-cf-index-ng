@@ -75,14 +75,7 @@ const plyrOptions: Plyr.Options = {
   ratio: `${width ?? 16}:${height ?? 9}`,
   fullscreen: { iosNative: true },
   captions: { active: true, update: true }, // Forçar legendas ativas
-  controls: [
-    'play',             // Botão de play/pausa
-    'progress',         // Barra de progresso do vídeo
-    'current-time',     // Exibe o tempo atual de reprodução
-    'duration',         // Exibe a duração total do vídeo
-    'captions',         // Botão para controle das legendas
-    'fullscreen'        // Botão de tela cheia
-  ]
+  controls: ['play', 'duration', 'progress', 'current-time', 'captions', 'fullscreen']
 }
 
 
