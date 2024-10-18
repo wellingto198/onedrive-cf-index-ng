@@ -67,8 +67,9 @@ const VideoPlayer: FC<{
   ratio: `${width ?? 16}:${height ?? 9}`,
   fullscreen: { iosNative: true },
   captions: { active: true, update: true }, // Ativar legendas por padrão
-  controls: ['play', 'progress', 'fullscreen'], // Remove a barra de volume
+  controls: ['play', 'progress', 'current-time', 'duration', 'captions', 'fullscreen'], // Adicionar controle de legendas e exibir tempo
 }
+
 
   if (!isFlv) {
     plyrSource['sources'] = [{ src: videoUrl }]
