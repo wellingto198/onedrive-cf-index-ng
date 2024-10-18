@@ -56,16 +56,20 @@ const VideoPlayer: FC<{
   }, [videoUrl, isFlv, mpegts, subtitle])
 
   const plyrSource = {
-    type: 'video',
-    title: videoName,
-    poster: thumbnail,
-    tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
-  }
+  type: 'video',
+  title: videoName,
+  poster: thumbnail,
+  // Garantir que as legendas sejam ativadas automaticamente
+  tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
+}
+
   const plyrOptions: Plyr.Options = {
-    ratio: `${width ?? 16}:${height ?? 9}`,
-    fullscreen: { iosNative: true },
-    captions: { active: true, update: true },
-  }
+  ratio: `${width ?? 16}:${height ?? 9}`,
+  fullscreen: { iosNative: true },
+  captions: { active: true, update: true }, // Ativar legendas por padrão
+  controls: ['play', 'progress', 'fullscreen'], // Remove a barra de volume
+}
+
   if (!isFlv) {
     plyrSource['sources'] = [{ src: videoUrl }]
   }
