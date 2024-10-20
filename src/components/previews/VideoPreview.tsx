@@ -157,23 +157,36 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
         </div>
 
         {/* Texto acima dos botões */}
-        <p style={{ color: 'white', textAlign: 'center' }}>
-          {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
-            <>
-              Sem áudio?{' '}
-              <a
-                href="https://www.codecguide.com/download_k-lite_codec_pack_basic.htm"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: '#ADD8E6' }}
-              >
-                Instale K-lite
-              </a>
-            </>
-          ) : (
-            'Sem áudio? Use algum dos players abaixo'
-          )}
-        </p>
+        {/* Texto acima dos botões */}
+<p
+  style={{
+    color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'white'
+      : 'black',
+    textAlign: 'center',
+  }}
+>
+  {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
+    <>
+      Sem áudio?{' '}
+      <a
+        href="https://www.codecguide.com/download_k-lite_codec_pack_basic.htm"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? '#ADD8E6'
+            : '#0000EE', // Cor do link para modo claro
+        }}
+      >
+        Instale K-lite
+      </a>
+    </>
+  ) : (
+    'Sem áudio? Use algum dos players abaixo'
+  )}
+</p>
+
 
         {/* Espaço adicionado entre o texto e os botões */}
         <div style={{ marginBottom: '20px' }} />
