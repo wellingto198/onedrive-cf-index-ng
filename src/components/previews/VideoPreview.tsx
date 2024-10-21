@@ -157,36 +157,34 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
         </div>
 
         {/* Texto acima dos botões */}
-        {/* Texto acima dos botões */}
-<p
-  style={{
-    color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'white'
-      : 'black',
-    textAlign: 'center',
-  }}
->
-  {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
-    <>
-      Sem áudio?{' '}
-      <a
-        href="https://www.codecguide.com/download_k-lite_codec_pack_basic.htm"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? '#ADD8E6'
-            : '#0000EE', // Cor do link para modo claro
-        }}
-      >
-        Instale K-lite
-      </a>
-    </>
-  ) : (
-    'Sem áudio? Use algum dos players abaixo'
-  )}
-</p>
-
+        <p
+          style={{
+            color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'white'
+              : 'black',
+            textAlign: 'center',
+          }}
+        >
+          {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
+            <>
+              Sem áudio?{' '}
+              <a
+                href="https://www.codecguide.com/download_k-lite_codec_pack_basic.htm"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? '#ADD8E6'
+                    : '#0000EE', // Cor do link para modo claro
+                }}
+              >
+                Instale K-lite
+              </a>
+            </>
+          ) : (
+            'Sem áudio? Use algum dos players abaixo'
+          )}
+        </p>
 
         {/* Espaço adicionado entre o texto e os botões */}
         <div style={{ marginBottom: '20px' }} />
@@ -195,18 +193,17 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
         {typeof window !== 'undefined' && !window.navigator.platform.includes('Win') && (
           <div style={{ textAlign: 'center' }}>
             <DownloadButton
-              onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}
+              onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl().replace(/\/$/, '')}${videoUrl}`)}
               btnText="IINA"
               btnImage="/players/iina.png"
             />
             <DownloadButton
-  onClickCallback={() => window.open(`vlc://${videoUrl.replace(/^http(s)?:\/\//, '')}`)}
-  btnText="VLC"
-  btnImage="/players/vlc.png"
-/>
-
+              onClickCallback={() => window.open(`vlc://${getBaseUrl().replace(/\/$/, '')}${videoUrl}`)}
+              btnText="VLC"
+              btnImage="/players/vlc.png"
+            />
             <DownloadButton
-              onClickCallback={() => window.open(`potplayer://${getBaseUrl()}${videoUrl}`)}
+              onClickCallback={() => window.open(`potplayer://${getBaseUrl().replace(/\/$/, '')}${videoUrl}`)}
               btnText="PotPlayer"
               btnImage="/players/potplayer.png"
             />
@@ -216,11 +213,11 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
               btnImage="/players/nplayer.png"
             />
             <DownloadButton
-              onClickCallback={() => window.open(`intent://${getBaseUrl()}${videoUrl}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
+              onClickCallback={() => window.open(`intent://${getBaseUrl().replace(/\/$/, '')}${videoUrl}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
               btnText="mpv-android"
               btnImage="/players/mpv-android.png"
             />
-          </div> /* Closing div added here */
+          </div>
         )}
       </DownloadBtnContainer>
     </>
