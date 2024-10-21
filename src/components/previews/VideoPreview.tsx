@@ -193,17 +193,17 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
         {typeof window !== 'undefined' && !window.navigator.platform.includes('Win') && (
           <div style={{ textAlign: 'center' }}>
             <DownloadButton
-              onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl().replace(/\/$/, '')}${videoUrl}`)}
+              onClickCallback={() => window.open(`iina://weblink?url=${videoUrl}`)}
               btnText="IINA"
               btnImage="/players/iina.png"
             />
             <DownloadButton
-              onClickCallback={() => window.open(`vlc://${getBaseUrl().replace(/\/$/, '')}${videoUrl}`)}
+              onClickCallback={() => window.open(`vlc://${videoUrl.replace(/^https?:\/\//, '')}`)}
               btnText="VLC"
               btnImage="/players/vlc.png"
             />
             <DownloadButton
-              onClickCallback={() => window.open(`potplayer://${getBaseUrl().replace(/\/$/, '')}${videoUrl}`)}
+              onClickCallback={() => window.open(`potplayer://${videoUrl.replace(/^https?:\/\//, '')}`)}
               btnText="PotPlayer"
               btnImage="/players/potplayer.png"
             />
@@ -213,7 +213,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
               btnImage="/players/nplayer.png"
             />
             <DownloadButton
-              onClickCallback={() => window.open(`intent://${getBaseUrl().replace(/\/$/, '')}${videoUrl}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
+              onClickCallback={() => window.open(`intent://${videoUrl.replace(/^https?:\/\//, '')}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
               btnText="mpv-android"
               btnImage="/players/mpv-android.png"
             />
