@@ -209,12 +209,14 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             />
            <DownloadButton
   onClickCallback={() => {
-    const fullUrl = getFullUrl(videoUrl); // Gera a URL completa corretamente
-    window.location.href = `vlc://${fullUrl}`;
+    const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+    const vlcUrl = `vlc://${videoUrl.replace(/^https?:\/\//, '')}`; // Remove protocolo http/https para evitar duplicação
+    window.location.href = vlcUrl;
   }}
   btnText="VLC"
   btnImage="/players/vlc.png"
 />
+
 
 
 
