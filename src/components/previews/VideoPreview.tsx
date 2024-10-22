@@ -94,36 +94,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
   const subtitle = `/api/raw?path=${vtt}${hashedToken ? `&odpt=${hashedToken}` : ''}`
   const videoUrl = `/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`
 
-  // Função para mostrar um toast
-function showToast(message) {
-    // Aqui você pode personalizar a implementação do toast
-    const toast = document.createElement('div');
-    toast.className = 'toast'; // Adicione a classe que você estiver usando para o estilo do toast
-    toast.innerText = message;
-    document.body.appendChild(toast);
-    
-    // Remover o toast após 3 segundos
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
-}
-
-// Verifica se o arquivo .vtt existe
-fetch(vtt)
-    .then(response => {
-        if (!response.ok) {
-            // Se não encontrar o arquivo, mostra o toast
-            showToast('Não há legendas disponíveis.');
-        } else {
-            // O arquivo .vtt existe, continue com seu código
-            console.log('Legendas encontradas.');
-        }
-    })
-    .catch(error => {
-        // Caso ocorra um erro durante a requisição
-        console.error('Erro ao verificar as legendas:', error);
-        showToast('Não foi possível verificar as legendas.');
-    });
+ 
 
   const isFlv = getExtension(file.name) === 'flv'
   const { loading, error, result: mpegts } = useAsync(async () => {
@@ -163,18 +134,31 @@ fetch(vtt)
         )}
         
       </PreviewContainer>
+async function verificarExistenciaLegendas(vtt) {
+  try {
+    const response = await fetch(vtt); // Tente obter o arquivo .vtt
+    return response.ok; // Retorna verdadeiro se o arquivo existir
+  } catch (error) {
+    console.error('Erro ao verificar legendas:', error);
+    return false; // Retorna falso em caso de erro
+  }
+}
+
+      
+const legendasDisponiveis = await verificarExistenciaLegendas(vtt); // Verifique se o arquivo .vtt existe
+
 {/* Mensagem para ativar legendas */}
-        <p
-          style={{
-            textAlign: 'center',
-            marginTop: '10px',
-            color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-              ? 'white' // Cor para o tema escuro
-              : 'black', // Cor para o tema claro
-          }}
-        >
-          Sem legenda? Aperte &quot;CC&quot; no player.
-        </p>
+<p
+  style={{
+    textAlign: 'center',
+    marginTop: '10px',
+    color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'white' // Cor para o tema escuro
+      : 'black', // Cor para o tema claro
+  }}
+>
+  {legendasDisponiveis ? 'Sem legenda? Aperte "CC" no player.' : 'Sem legendas disponíveis.'}
+</p>
       <DownloadBtnContainer>
         <div className="flex flex-wrap justify-center gap-2">
           <DownloadButton
