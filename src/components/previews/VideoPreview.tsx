@@ -1,35 +1,35 @@
-import type { OdFileObject } from '../../types';
+import type { OdFileObject } from '../../types'
 
-import { FC, useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { FC, useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import Plyr from 'plyr-react';
-import { useAsync } from 'react-async-hook';
-import { useClipboard } from 'use-clipboard-copy';
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import Plyr from 'plyr-react'
+import { useAsync } from 'react-async-hook'
+import { useClipboard } from 'use-clipboard-copy'
 
-import { getBaseUrl } from '../../utils/getBaseUrl';
-import { getExtension } from '../../utils/getFileIcon';
-import { getStoredToken } from '../../utils/protectedRouteHandler';
+import { getBaseUrl } from '../../utils/getBaseUrl'
+import { getExtension } from '../../utils/getFileIcon'
+import { getStoredToken } from '../../utils/protectedRouteHandler'
 
-import { DownloadButton } from '../DownloadBtnGtoup';
-import { DownloadBtnContainer, PreviewContainer } from './Containers';
-import FourOhFour from '../FourOhFour';
-import Loading from '../Loading';
-import CustomEmbedLinkMenu from '../CustomEmbedLinkMenu';
+import { DownloadButton } from '../DownloadBtnGtoup'
+import { DownloadBtnContainer, PreviewContainer } from './Containers'
+import FourOhFour from '../FourOhFour'
+import Loading from '../Loading'
+import CustomEmbedLinkMenu from '../CustomEmbedLinkMenu'
 
-import 'plyr-react/plyr.css';
+import 'plyr-react/plyr.css'
 
 const VideoPlayer: FC<{
-  videoName: string;
-  videoUrl: string;
-  width?: number;
-  height?: number;
-  thumbnail: string;
-  subtitle: string;
-  isFlv: boolean;
-  mpegts: any;
+  videoName: string
+  videoUrl: string
+  width?: number
+  height?: number
+  thumbnail: string
+  subtitle: string
+  isFlv: boolean
+  mpegts: any
 }> = ({ videoName, videoUrl, width, height, thumbnail, subtitle, isFlv, mpegts }) => {
   
   useEffect(() => {
@@ -37,98 +37,78 @@ const VideoPlayer: FC<{
     axios
       .get(subtitle, { responseType: 'blob' })
       .then(resp => {
-        const track = document.querySelector('track');
+        const track = document.querySelector('track')
         if (track) {
-          track.setAttribute('src', URL.createObjectURL(resp.data));
-          track.setAttribute('default', 'true');
-          const video = document.querySelector('video');
+          track.setAttribute('src', URL.createObjectURL(resp.data))
+          track.setAttribute('default', 'true') // Garantir que a legenda seja padrão
+          const video = document.querySelector('video')
           if (video) {
-            video.textTracks[0].mode = 'showing';
+            video.textTracks[0].mode = 'showing' // Forçar a exibição automática das legendas
           }
         }
       })
       .catch(() => {
-        console.log('Could not load subtitle.');
-      });
+        console.log('Could not load subtitle.')
+      })
 
     if (isFlv) {
       const loadFlv = () => {
-        const video = document.getElementById('plyr');
-        const flv = mpegts.createPlayer({ url: videoUrl, type: 'flv' });
-        flv.attachMediaElement(video);
-        flv.load();
-      };
-      loadFlv();
+        const video = document.getElementById('plyr')
+        const flv = mpegts.createPlayer({ url: videoUrl, type: 'flv' })
+        flv.attachMediaElement(video)
+        flv.load()
+      }
+      loadFlv()
     }
-  }, [videoUrl, isFlv, mpegts, subtitle]);
+  }, [videoUrl, isFlv, mpegts, subtitle])
 
   const plyrSource = {
     type: 'video',
     title: videoName,
     poster: thumbnail,
     tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
-  };
+  }
 
   const plyrOptions: Plyr.Options = {
     ratio: `${width ?? 16}:${height ?? 9}`,
     fullscreen: { iosNative: true },
     captions: { active: true, update: true },
     controls: ['play', 'current-time', 'progress', 'duration', 'captions', 'fullscreen'],
-  };
-
-  if (!isFlv) {
-    plyrSource['sources'] = [{ src: videoUrl }];
   }
 
-  return <Plyr id="plyr" source={plyrSource as Plyr.SourceInfo} options={plyrOptions} />;
-};
+  if (!isFlv) {
+    plyrSource['sources'] = [{ src: videoUrl }]
+  }
+  return <Plyr id="plyr" source={plyrSource as Plyr.SourceInfo} options={plyrOptions} />
+}
 
 const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
-  const { asPath } = useRouter();
-  const hashedToken = getStoredToken(asPath);
-  const clipboard = useClipboard();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { asPath } = useRouter()
+  const hashedToken = getStoredToken(asPath)
+  const clipboard = useClipboard()
 
-  // Thumbnail e Subtitle URLs
-  const thumbnail = `/api/thumbnail?path=${asPath}&size=large${hashedToken ? `&odpt=${hashedToken}` : ''}`;
-  const vtt = `${asPath.substring(0, asPath.lastIndexOf('.'))}.vtt`;
-  const subtitle = `/api/raw?path=${vtt}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
-  const videoUrl = `/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
-  const isFlv = getExtension(file.name) === 'flv';
+  const [menuOpen, setMenuOpen] = useState(false)
 
+  const thumbnail = `/api/thumbnail?path=${asPath}&size=large${hashedToken ? `&odpt=${hashedToken}` : ''}`
+  const vtt = `${asPath.substring(0, asPath.lastIndexOf('.'))}.vtt`
+  const subtitle = `/api/raw?path=${vtt}${hashedToken ? `&odpt=${hashedToken}` : ''}`
+  const videoUrl = `/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`
+
+  const isFlv = getExtension(file.name) === 'flv'
   const { loading, error, result: mpegts } = useAsync(async () => {
     if (isFlv) {
-      return (await import('mpegts.js')).default;
+      return (await import('mpegts.js')).default
     }
-  }, [isFlv]);
+  }, [isFlv])
 
   const getFullUrl = (url: string) => {
-    return url.startsWith('http') ? url : `${window.location.protocol}//${window.location.hostname}${url}`;
-  };
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url
+    }
+    return `${window.location.protocol}//${window.location.hostname}${url}`
+  }
 
-  const renderDownloadButtons = () => {
-    const videoBaseUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
-
-    return (
-      <>
-        <DownloadButton
-          onClickCallback={() => window.open(videoBaseUrl)}
-          btnColor="blue"
-          btnText={'Baixar'}
-          btnIcon="file-download"
-        />
-        <DownloadButton
-          onClickCallback={() => {
-            clipboard.copy(videoBaseUrl);
-            toast.success('Link Copiado.');
-          }}
-          btnColor="pink"
-          btnText={'Copiar Link'}
-          btnIcon="copy"
-        />
-      </>
-    );
-  };
+  const isWindows = typeof window !== 'undefined' && window.navigator.platform.includes('Win');
 
   return (
     <>
@@ -154,14 +134,31 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
 
       <DownloadBtnContainer>
         <div className="flex flex-wrap justify-center gap-2">
-          {renderDownloadButtons()}
+          <DownloadButton
+            onClickCallback={() => window.open(videoUrl)}
+            btnColor="blue"
+            btnText={'Baixar'}
+            btnIcon="file-download"
+          />
+          <DownloadButton
+            onClickCallback={() => {
+              clipboard.copy(`${getBaseUrl()}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`)
+              toast.success('Link Copiado.')
+            }}
+            btnColor="pink"
+            btnText={'Copiar Link'}
+            btnIcon="copy"
+          />
         </div>
 
-        {/* Texto acima dos botões */}
-        <p style={{
-          color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'white' : 'black',
-          textAlign: 'center',
-        }}>
+        <p
+          style={{
+            color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'white'
+              : 'black',
+            textAlign: 'center',
+          }}
+        >
           {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
             <>
               Sem áudio?{' '}
@@ -170,7 +167,9 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? '#ADD8E6' : '#0000EE',
+                  color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? '#ADD8E6'
+                    : '#0000EE',
                 }}
               >
                 Instale K-lite
@@ -181,18 +180,75 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
           )}
         </p>
 
-        {/* Espaço adicionado entre o texto e os botões */}
         <div style={{ marginBottom: '20px' }} />
-        
-        {/* Condicional para renderizar botões de players se não for Windows */}
-        {!typeof window !== 'undefined' || !window.navigator.platform.includes('Win') && (
+
+        {!isWindows && (
           <>
-            {/* Botões de players externos aqui, você pode criar uma função semelhante para gerá-los */}
+            <DownloadButton
+              onClickCallback={() => {
+                const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+                window.open(videoUrl);
+              }}
+              btnColor="blue"
+              btnText={'Baixar'}
+              btnIcon="file-download"
+            />
+
+            <DownloadButton
+              onClickCallback={() => {
+                const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+                clipboard.copy(videoUrl);
+                toast.success('Link Copiado.');
+              }}
+              btnColor="pink"
+              btnText={'Copiar Link'}
+              btnIcon="copy"
+            />
+
+            <DownloadButton
+              onClickCallback={() => {
+                const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+                const encodedUrl = encodeURIComponent(videoUrl);
+                window.location.href = `iina://weblink?url=${encodedUrl}`;
+              }}
+              btnText="IINA"
+              btnImage="/players/iina.png"
+            />
+
+            <DownloadButton
+              onClickCallback={() => {
+                const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+                const vlcUrl = `vlc://${videoUrl.replace(/^https?:\/\//, '')}`;
+                window.location.href = vlcUrl;
+              }}
+              btnText="VLC"
+              btnImage="/players/vlc.png"
+            />
+
+            <DownloadButton
+              onClickCallback={() => {
+                const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+                const potPlayerUrl = `potplayer://${videoUrl.replace(/^https?:\/\//, '')}`;
+                window.location.href = potPlayerUrl;
+              }}
+              btnText="PotPlayer"
+              btnImage="/players/potplayer.png"
+            />
+
+            <DownloadButton
+              onClickCallback={() => {
+                const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+                const nPlayerUrl = `nplayer-http://${videoUrl.replace(/^https?:\/\//, '')}`;
+                window.location.href = nPlayerUrl;
+              }}
+              btnText="NPlayer"
+              btnImage="/players/nplayer.png"
+            />
           </>
         )}
       </DownloadBtnContainer>
     </>
-  );
-};
+  )
+}
 
-export default VideoPreview;
+export default VideoPreview
