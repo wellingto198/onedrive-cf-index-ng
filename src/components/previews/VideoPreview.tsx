@@ -130,7 +130,9 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             mpegts={mpegts}
           />
         )}
-        {/* Mensagem para ativar legendas */}
+        
+      </PreviewContainer>
+{/* Mensagem para ativar legendas */}
         <p
           style={{
             textAlign: 'center',
@@ -140,10 +142,8 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
               : 'black', // Cor para o tema claro
           }}
         >
-          Sem legenda? Aperte "CC" no player.
+          Sem legenda? Aperte &quot;CC&quot; no player.
         </p>
-      </PreviewContainer>
-
       <DownloadBtnContainer>
         <div className="flex flex-wrap justify-center gap-2">
           <DownloadButton
