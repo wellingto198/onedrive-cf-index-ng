@@ -134,31 +134,29 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
         )}
         
       </PreviewContainer>
-async function verificarExistenciaLegendas(vtt) {
-  try {
-    const response = await fetch(vtt); // Tente obter o arquivo .vtt
-    return response.ok; // Retorna verdadeiro se o arquivo existir
-  } catch (error) {
-    console.error('Erro ao verificar legendas:', error);
-    return false; // Retorna falso em caso de erro
-  }
+async function verificarLegendas(asPath) {
+  const vtt = `${asPath.substring(0, asPath.lastIndexOf('.'))}.vtt`;
+  
+  const legendasDisponiveis = await verificarExistenciaLegendas(vtt);
+
+  return (
+    <p
+      style={{
+        textAlign: 'center',
+        marginTop: '10px',
+        color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'white' // Cor para o tema escuro
+          : 'black', // Cor para o tema claro
+      }}
+    >
+      {legendasDisponiveis ? 'Sem legenda? Aperte "CC" no player.' : 'Sem legendas disponíveis.'}
+    </p>
+  );
 }
 
-      
-const legendasDisponiveis = await verificarExistenciaLegendas(vtt); // Verifique se o arquivo .vtt existe
+// Chamada da função
+verificarLegendas(asPath);
 
-{/* Mensagem para ativar legendas */}
-<p
-  style={{
-    textAlign: 'center',
-    marginTop: '10px',
-    color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'white' // Cor para o tema escuro
-      : 'black', // Cor para o tema claro
-  }}
->
-  {legendasDisponiveis ? 'Sem legenda? Aperte "CC" no player.' : 'Sem legendas disponíveis.'}
-</p>
       <DownloadBtnContainer>
         <div className="flex flex-wrap justify-center gap-2">
           <DownloadButton
