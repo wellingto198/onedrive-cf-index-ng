@@ -115,6 +115,16 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
     }
   }, [isFlv])
 
+  const getFullUrl = (url: string) => {
+  // Se a URL já começar com 'http' ou 'https', retorná-la como está
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  // Se a URL não tem protocolo, adicionar o protocolo atual da página
+  return `${window.location.protocol}//${window.location.hostname}${url}`
+}
+
+
   return (
     <>
       <CustomEmbedLinkMenu path={asPath} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
@@ -199,12 +209,13 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             />
            <DownloadButton
   onClickCallback={() => {
-    const cleanedUrl = `${window.location.protocol}//${window.location.hostname}${videoUrl}`; // Garante que a URL tenha o protocolo correto
-    window.location.href = `vlc://${cleanedUrl}`;
+    const fullUrl = getFullUrl(videoUrl); // Gera a URL completa corretamente
+    window.location.href = `vlc://${fullUrl}`;
   }}
   btnText="VLC"
   btnImage="/players/vlc.png"
 />
+
 
 
 
