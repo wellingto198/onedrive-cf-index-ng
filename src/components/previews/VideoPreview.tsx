@@ -88,13 +88,12 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
   const clipboard = useClipboard()
 
   const [menuOpen, setMenuOpen] = useState(false)
+  const [legendasDisponiveis, setLegendasDisponiveis] = useState(true) // Inicialmente assume que legendas estão disponíveis
 
   const thumbnail = `/api/thumbnail?path=${asPath}&size=large${hashedToken ? `&odpt=${hashedToken}` : ''}`
   const vtt = `${asPath.substring(0, asPath.lastIndexOf('.'))}.vtt`
   const subtitle = `/api/raw?path=${vtt}${hashedToken ? `&odpt=${hashedToken}` : ''}`
   const videoUrl = `/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`
-
- 
 
   const isFlv = getExtension(file.name) === 'flv'
   const { loading, error, result: mpegts } = useAsync(async () => {
@@ -103,12 +102,20 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
     }
   }, [isFlv])
 
-  const getFullUrl = (url: string) => {
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url
+  // Função para verificar a existência das legendas
+  const verificarExistenciaLegendas = async (subtitleUrl: string) => {
+    try {
+      await axios.head(subtitleUrl); // Usar HEAD para verificar a existência do arquivo
+      setLegendasDisponiveis(true);
+    } catch (error) {
+      console.log('Legendas não encontradas:', error);
+      setLegendasDisponiveis(false);
     }
-    return `${window.location.protocol}//${window.location.hostname}${url}`
-  }
+  };
+
+  useEffect(() => {
+    verificarExistenciaLegendas(subtitle); // Verificar legendas ao carregar o componente
+  }, [subtitle]);
 
   const isWindows = typeof window !== 'undefined' && window.navigator.platform.includes('Win');
 
@@ -133,29 +140,18 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
           />
         )}
         
+        <p
+          style={{
+            textAlign: 'center',
+            marginTop: '10px',
+            color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'white'
+              : 'black',
+          }}
+        >
+          {legendasDisponiveis ? 'Sem legenda? Aperte "CC" no player.' : 'Sem legendas disponíveis.'}
+        </p>
       </PreviewContainer>
-async function verificarLegendas(asPath) {
-  const vtt = `${asPath.substring(0, asPath.lastIndexOf('.'))}.vtt`;
-  
-  const legendasDisponiveis = await verificarExistenciaLegendas(vtt);
-
-  return (
-    <p
-      style={{
-        textAlign: 'center',
-        marginTop: '10px',
-        color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-          ? 'white' // Cor para o tema escuro
-          : 'black', // Cor para o tema claro
-      }}
-    >
-      {legendasDisponiveis ? 'Sem legenda? Aperte "CC" no player.' : 'Sem legendas disponíveis.'}
-    </p>
-  );
-}
-
-// Chamada da função
-verificarLegendas(asPath);
 
       <DownloadBtnContainer>
         <div className="flex flex-wrap justify-center gap-2">
@@ -184,7 +180,7 @@ verificarLegendas(asPath);
             textAlign: 'center',
           }}
         >
-          {typeof window !== 'undefined' && window.navigator.platform.includes('Win') ? (
+          {isWindows ? (
             <>
               Sem áudio?{' '}
               <a
@@ -209,63 +205,27 @@ verificarLegendas(asPath);
 
         {!isWindows && (
           <>
-           
+            {/* Botão para IINA */}
+            <DownloadButton
+              onClickCallback={() => {
+                const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+                const encodedUrl = encodeURIComponent(videoUrl); // Codifica a URL
+                window.location.href = `iina://weblink?url=${encodedUrl}`;
+              }}
+              btnText="IINA"
+              btnImage="/players/iina.png"
+            />
 
-{/* Botão para IINA */}
-<DownloadButton
-  onClickCallback={() => {
-    const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
-    const encodedUrl = encodeURIComponent(videoUrl); // Codifica a URL
-    window.location.href = `iina://weblink?url=${encodedUrl}`;
-  }}
-  btnText="IINA"
-  btnImage="/players/iina.png"
-/>
-
-{/* Botão para VLC */}
-<DownloadButton
-  onClickCallback={() => {
-    const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
-    const vlcUrl = `vlc://${videoUrl.replace(/^https?:\/\//, '')}`; // Remove protocolo http/https
-    window.location.href = vlcUrl;
-  }}
-  btnText="VLC"
-  btnImage="/players/vlc.png"
-/>
-
-{/* Botão para PotPlayer */}
-<DownloadButton
-  onClickCallback={() => {
-    const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
-    const potPlayerUrl = `potplayer://${videoUrl.replace(/^https?:\/\//, '')}`; // Remove protocolo http/https
-    window.location.href = potPlayerUrl;
-  }}
-  btnText="PotPlayer"
-  btnImage="/players/potplayer.png"
-/>
-
-{/* Botão para nPlayer */}
-<DownloadButton
-  onClickCallback={() => {
-    const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
-    const nPlayerUrl = `nplayer-http://${videoUrl.replace(/^https?:\/\//, '')}`; // Remove protocolo http/https
-    window.location.href = nPlayerUrl;
-  }}
-  btnText="nPlayer"
-  btnImage="/players/nplayer.png"
-/>
-
-{/* Botão para mpv-android */}
-<DownloadButton
-  onClickCallback={() => {
-    const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
-    const mpvUrl = `intent://${videoUrl.replace(/^https?:\/\//, '')}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`; // Remove protocolo http/https
-    window.location.href = mpvUrl;
-  }}
-  btnText="mpv-android"
-  btnImage="/players/mpv-android.png"
-/>
-
+            {/* Botão para VLC */}
+            <DownloadButton
+              onClickCallback={() => {
+                const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+                const vlcUrl = `vlc://${videoUrl.replace(/^https?:\/\//, '')}`; // Remove protocolo http/https
+                window.location.href = vlcUrl;
+              }}
+              btnText="VLC"
+              btnImage="/players/vlc.png"
+            />
           </>
         )}
       </DownloadBtnContainer>
