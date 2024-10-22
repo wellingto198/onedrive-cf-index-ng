@@ -198,10 +198,15 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
               btnImage="/players/iina.png"
             />
             <DownloadButton
-  onClickCallback={() => window.open(`vlc://${videoUrl.replace(/^https?:\/\//, '')}`)}
+  onClickCallback={() => {
+    // Remove o protocolo da URL para evitar "http://https://"
+    const cleanedUrl = videoUrl.replace(/^https?:\/\//, '');
+    window.open(`vlc://${cleanedUrl}`);
+  }}
   btnText="VLC"
   btnImage="/players/vlc.png"
 />
+
 
             <DownloadButton
               onClickCallback={() => window.open(`potplayer://${videoUrl.replace(/^https?:\/\//, '')}`)}
