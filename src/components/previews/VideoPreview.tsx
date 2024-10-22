@@ -131,7 +131,18 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
           />
         )}
       </PreviewContainer>
-
+{/* Mensagem para ativar legendas */}
+        <p
+          style={{
+            textAlign: 'center',
+            marginTop: '10px',
+            color: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'white' // Cor para o tema escuro
+              : 'black', // Cor para o tema claro
+          }}
+        >
+          Sem legenda? Aperte "CC" no player.
+        </p>
       <DownloadBtnContainer>
         <div className="flex flex-wrap justify-center gap-2">
           <DownloadButton
