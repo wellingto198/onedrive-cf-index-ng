@@ -199,49 +199,86 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
         {/* Espaço adicionado entre o texto e os botões */}
         <div style={{ marginBottom: '20px' }} />
 
-        {/* Mostrar botões de players somente em dispositivos não-Windows */}
-        
-          <div style={{ textAlign: 'center' }}>
-            <DownloadButton
-              onClickCallback={() => window.open(`iina://weblink?url=${videoUrl}`)}
-              btnText="IINA"
-              btnImage="/players/iina.png"
-            />
-           <DownloadButton
-  onClickCallback={() => {
-    const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
-    const vlcUrl = `vlc://${videoUrl.replace(/^https?:\/\//, '')}`; // Remove protocolo http/https para evitar duplicação
-    window.location.href = vlcUrl;
-  }}
-  btnText="VLC"
-  btnImage="/players/vlc.png"
-/>
+        const isWindows = typeof window !== 'undefined' && window.navigator.platform.includes('Win');
 
+return (
+  <>
+    {!isWindows && (
+      <>
+        <DownloadButton
+          onClickCallback={() => {
+            const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+            window.open(videoUrl);
+          }}
+          btnColor="blue"
+          btnText={'Baixar'}
+          btnIcon="file-download"
+        />
 
+        <DownloadButton
+          onClickCallback={() => {
+            const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+            clipboard.copy(videoUrl);
+            toast.success('Link Copiado.');
+          }}
+          btnColor="pink"
+          btnText={'Copiar Link'}
+          btnIcon="copy"
+        />
 
+        <DownloadButton
+          onClickCallback={() => {
+            const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+            const encodedUrl = encodeURIComponent(videoUrl);
+            window.location.href = `iina://weblink?url=${encodedUrl}`;
+          }}
+          btnText="IINA"
+          btnImage="/players/iina.png"
+        />
 
+        <DownloadButton
+          onClickCallback={() => {
+            const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+            const vlcUrl = `vlc://${videoUrl.replace(/^https?:\/\//, '')}`;
+            window.location.href = vlcUrl;
+          }}
+          btnText="VLC"
+          btnImage="/players/vlc.png"
+        />
 
+        <DownloadButton
+          onClickCallback={() => {
+            const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+            const potPlayerUrl = `potplayer://${videoUrl.replace(/^https?:\/\//, '')}`;
+            window.location.href = potPlayerUrl;
+          }}
+          btnText="PotPlayer"
+          btnImage="/players/potplayer.png"
+        />
 
-            <DownloadButton
-              onClickCallback={() => window.open(`potplayer://${videoUrl.replace(/^https?:\/\//, '')}`)}
-              btnText="PotPlayer"
-              btnImage="/players/potplayer.png"
-            />
-            <DownloadButton
-              onClickCallback={() => window.open(`nplayer-http://${window?.location.hostname ?? ''}${videoUrl}`)}
-              btnText="nPlayer"
-              btnImage="/players/nplayer.png"
-            />
-            <DownloadButton
-              onClickCallback={() => window.open(`intent://${videoUrl.replace(/^https?:\/\//, '')}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`)}
-              btnText="mpv-android"
-              btnImage="/players/mpv-android.png"
-            />
-          </div>
-    
-      </DownloadBtnContainer>
-    </>
-  )
-}
+        <DownloadButton
+          onClickCallback={() => {
+            const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+            const nPlayerUrl = `nplayer-http://${videoUrl.replace(/^https?:\/\//, '')}`;
+            window.location.href = nPlayerUrl;
+          }}
+          btnText="nPlayer"
+          btnImage="/players/nplayer.png"
+        />
+
+        <DownloadButton
+          onClickCallback={() => {
+            const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
+            const mpvUrl = `intent://${videoUrl.replace(/^https?:\/\//, '')}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;`;
+            window.location.href = mpvUrl;
+          }}
+          btnText="mpv-android"
+          btnImage="/players/mpv-android.png"
+        />
+      </>
+    )}
+  </>
+);
+
 
 export default VideoPreview
