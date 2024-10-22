@@ -149,7 +149,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
               : 'black',
           }}
         >
-          {legendasDisponiveis ? 'Sem legenda? Aperte "CC" no player.' : 'Sem legendas disponíveis.'}
+          {legendasDisponiveis ? 'Legenda externa disponível, Aperte "CC" no player.' : 'Sem legendas externas disponíveis.'}
         </p>
       </PreviewContainer>
 
