@@ -199,13 +199,14 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             />
             <DownloadButton
   onClickCallback={() => {
-    // Remove o protocolo da URL para evitar "http://https://"
-    const cleanedUrl = videoUrl.replace(/^https?:\/\//, '');
-    window.open(`vlc://${cleanedUrl}`);
+    // Usar location.href pode forçar a ação
+    const cleanedUrl = videoUrl.replace(/^https?:\/\//, ''); // Remove o protocolo da URL
+    window.location.href = `vlc://${cleanedUrl}`;
   }}
   btnText="VLC"
   btnImage="/players/vlc.png"
 />
+
 
 
             <DownloadButton
