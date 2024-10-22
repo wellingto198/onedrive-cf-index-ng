@@ -226,6 +226,38 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
               btnText="VLC"
               btnImage="/players/vlc.png"
             />
+            {/* Botão para PotPlayer */}
+<DownloadButton
+  onClickCallback={() => {
+    const videoUrl = ${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? &odpt=${hashedToken} : ''};
+    const potPlayerUrl = potplayer://${videoUrl.replace(/^https?:\/\//, '')}; // Remove protocolo http/https
+    window.location.href = potPlayerUrl;
+  }}
+  btnText="PotPlayer"
+  btnImage="/players/potplayer.png"
+/>
+
+{/* Botão para nPlayer */}
+<DownloadButton
+  onClickCallback={() => {
+    const videoUrl = ${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? &odpt=${hashedToken} : ''};
+    const nPlayerUrl = nplayer-http://${videoUrl.replace(/^https?:\/\//, '')}; // Remove protocolo http/https
+    window.location.href = nPlayerUrl;
+  }}
+  btnText="nPlayer"
+  btnImage="/players/nplayer.png"
+/>
+
+{/* Botão para mpv-android */}
+<DownloadButton
+  onClickCallback={() => {
+    const videoUrl = ${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? &odpt=${hashedToken} : ''};
+    const mpvUrl = intent://${videoUrl.replace(/^https?:\/\//, '')}#Intent;type=video/any;package=is.xyz.mpv;scheme=https;end;; // Remove protocolo http/https
+    window.location.href = mpvUrl;
+  }}
+  btnText="mpv-android"
+  btnImage="/players/mpv-android.png"
+/>
           </>
         )}
       </DownloadBtnContainer>
