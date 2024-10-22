@@ -200,7 +200,7 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
         <div style={{ marginBottom: '20px' }} />
 
         {/* Mostrar botões de players somente em dispositivos não-Windows */}
-        {typeof window !== 'undefined' && !window.navigator.platform.includes('Win') && (
+        
           <div style={{ textAlign: 'center' }}>
             <DownloadButton
               onClickCallback={() => window.open(`iina://weblink?url=${videoUrl}`)}
