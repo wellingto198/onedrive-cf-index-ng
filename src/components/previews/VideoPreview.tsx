@@ -64,7 +64,6 @@ const VideoPlayer: FC<{
 
   const plyrSource = {
     type: isFlv ? 'video' : 'video', // Define como 'video', mesmo para FLV
-    title: videoName,
     poster: thumbnail,
     tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
     sources: isFlv ? [] : [{ src: videoUrl, type: 'video/mp4' }], // Adiciona a fonte com tipo específico
@@ -79,7 +78,9 @@ const VideoPlayer: FC<{
 
   return (
     <div>
-      <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>{videoName}</h2> {/* Adiciona o título acima do player */}
+      <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+        <h2>{videoName}</h2> {/* Adiciona o título acima do player */}
+      </div>
       <Plyr id="plyr" source={plyrSource} options={plyrOptions} />
     </div>
   );
