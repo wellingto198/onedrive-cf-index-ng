@@ -63,7 +63,7 @@ const VideoPlayer: FC<{
   }, [videoUrl, isFlv, mpegts, subtitle]);
 
   const plyrSource = {
-    type: 'video',
+    type: isFlv ? 'video' : 'video', // Define como 'video', mesmo para FLV
     title: videoName,
     poster: thumbnail,
     tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
