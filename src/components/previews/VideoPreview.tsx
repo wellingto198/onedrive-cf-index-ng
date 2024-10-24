@@ -67,6 +67,7 @@ const VideoPlayer: FC<{
     title: videoName,
     poster: thumbnail,
     tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
+    sources: isFlv ? [] : [{ src: videoUrl }], // Adiciona fontes apenas se não for FLV
   };
 
   const plyrOptions = {
@@ -75,10 +76,6 @@ const VideoPlayer: FC<{
     captions: { active: true, update: true },
     controls: ['play', 'current-time', 'progress', 'duration', 'captions', 'fullscreen'],
   };
-
-  if (!isFlv) {
-    plyrSource['sources'] = [{ src: videoUrl }];
-  }
 
   return (
     <div>
@@ -226,16 +223,6 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             }}
             btnText="VLC"
             btnImage="/players/vlc.png"
-          />
-
-          <DownloadButton
-            onClickCallback={() => {
-              const videoUrl = `${getBaseUrl().replace(/\/$/, '')}/api/raw?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`;
-              const potPlayerUrl = `potplayer://${videoUrl.replace(/^https?:\/\//, '')}`; // Remove protocolo http/https
-              window.location.href = potPlayerUrl;
-            }}
-            btnText="PotPlayer"
-            btnImage="/players/potplayer.png"
           />
 
           <DownloadButton
