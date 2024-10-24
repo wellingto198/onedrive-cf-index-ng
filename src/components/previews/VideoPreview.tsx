@@ -31,7 +31,6 @@ const VideoPlayer: FC<{
   isFlv: boolean;
   mpegts: any;
 }> = ({ videoName, videoUrl, width, height, thumbnail, subtitle, isFlv, mpegts }) => {
-  
   useEffect(() => {
     // Carregar a legenda automaticamente quando disponível
     axios
@@ -63,10 +62,10 @@ const VideoPlayer: FC<{
   }, [videoUrl, isFlv, mpegts, subtitle]);
 
   const plyrSource = {
-    type: isFlv ? 'video' : 'video', // Define como 'video', mesmo para FLV
+    type: 'video', // O tipo correto deve ser 'video'
     poster: thumbnail,
     tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
-    sources: isFlv ? [] : [{ src: videoUrl, type: 'video/mp4' }], // Adiciona a fonte com tipo específico
+    sources: isFlv ? [] : [{ src: videoUrl, type: 'video/mp4' }], // A fonte deve ter um tipo específico
   };
 
   const plyrOptions = {
@@ -77,10 +76,8 @@ const VideoPlayer: FC<{
   };
 
   return (
-    <div>
-      <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-        <h2>{videoName}</h2> {/* Adiciona o título acima do player */}
-      </div>
+    <div style={{ textAlign: 'center' }}>
+      <h2 style={{ marginBottom: '10px' }}>{videoName}</h2> {/* Adiciona o título acima do player */}
       <Plyr id="plyr" source={plyrSource} options={plyrOptions} />
     </div>
   );
