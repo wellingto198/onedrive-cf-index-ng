@@ -82,6 +82,14 @@ const VideoPlayer: FC<{
   return <Plyr id="plyr" source={plyrSource as Plyr.SourceInfo} options={plyrOptions} />
 }
 
+ return (
+    <div>
+      <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>{videoName}</h2> {/* Adiciona o título acima do player */}
+      <Plyr id="plyr" source={plyrSource as Plyr.SourceInfo} options={plyrOptions} />
+    </div>
+  )
+}
+
 const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
   const { asPath } = useRouter()
   const hashedToken = getStoredToken(asPath)
