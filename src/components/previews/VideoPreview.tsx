@@ -31,7 +31,7 @@ const VideoPlayer: FC<{
   isFlv: boolean;
   mpegts: any;
 }> = ({ videoName, videoUrl, width, height, thumbnail, subtitle, isFlv, mpegts }) => {
-
+  
   useEffect(() => {
     // Carregar a legenda automaticamente quando disponível
     axios
@@ -67,7 +67,7 @@ const VideoPlayer: FC<{
     title: videoName,
     poster: thumbnail,
     tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
-    sources: isFlv ? [] : [{ src: videoUrl }], // Adiciona fontes apenas se não for FLV
+    sources: isFlv ? [] : [{ src: videoUrl, type: 'video/mp4' }], // Adiciona a fonte com tipo específico
   };
 
   const plyrOptions = {
